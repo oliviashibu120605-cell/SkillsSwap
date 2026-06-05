@@ -3,840 +3,309 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SkillSwap — Learn. Teach. Earn.</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<title>SkillSwap</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
 <style>
-  :root {
-    --bg: #05060f;
-    --bg2: #0d0e1f;
-    --card: rgba(255,255,255,0.04);
-    --border: rgba(255,255,255,0.08);
-    --indigo: #6c63ff;
-    --indigo-light: #8b85ff;
-    --amber: #f5a623;
-    --green: #22d47a;
-    --text: #f0f0ff;
-    --muted: #8888aa;
-    --radius: 20px;
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    overflow-x: hidden;
-  }
-
-  /* ── NOISE OVERLAY ── */
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-    opacity: 0.03;
-    pointer-events: none;
-    z-index: 9999;
-  }
-
-  /* ── NAV ── */
-  nav {
-    position: fixed; top: 0; width: 100%;
-    background: rgba(5,6,15,0.85);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
-    z-index: 100;
-    padding: 0 5%;
-    height: 70px;
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .nav-logo {
-    font-family: 'Syne', sans-serif;
-    font-size: 1.5rem; font-weight: 800;
-    background: linear-gradient(135deg, var(--indigo-light), var(--amber));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    text-decoration: none;
-  }
-  .nav-links {
-    display: flex; gap: 2rem; list-style: none;
-    align-items: center;
-  }
-  .nav-links a {
-    color: var(--muted); text-decoration: none;
-    font-size: 0.9rem; font-weight: 500;
-    transition: color 0.2s;
-  }
-  .nav-links a:hover { color: var(--text); }
-  .nav-cta {
-    background: var(--indigo);
-    color: #fff !important;
-    padding: 0.55rem 1.3rem;
-    border-radius: 50px;
-    font-weight: 600 !important;
-    transition: background 0.2s, transform 0.2s !important;
-  }
-  .nav-cta:hover { background: var(--indigo-light) !important; transform: translateY(-1px); }
-  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; }
-  .hamburger span { display: block; width: 24px; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.3s; }
-  .mobile-menu {
-    display: none; position: fixed; top: 70px; left: 0; width: 100%;
-    background: var(--bg2); border-bottom: 1px solid var(--border);
-    flex-direction: column; padding: 1.5rem 5%; gap: 1.2rem; z-index: 99;
-  }
-  .mobile-menu.open { display: flex; }
-  .mobile-menu a { color: var(--muted); text-decoration: none; font-size: 1rem; }
-
-  /* ── HERO ── */
-  .hero {
-    min-height: 100vh;
-    display: flex; align-items: center;
-    padding: 120px 5% 80px;
-    position: relative; overflow: hidden;
-  }
-  .hero-glow {
-    position: absolute;
-    width: 700px; height: 700px;
-    background: radial-gradient(circle, rgba(108,99,255,0.18) 0%, transparent 70%);
-    top: -100px; right: -100px;
-    pointer-events: none;
-  }
-  .hero-glow2 {
-    position: absolute;
-    width: 400px; height: 400px;
-    background: radial-gradient(circle, rgba(245,166,35,0.1) 0%, transparent 70%);
-    bottom: 0; left: 10%;
-    pointer-events: none;
-  }
-  .hero-inner { max-width: 1100px; margin: 0 auto; width: 100%; display: flex; align-items: center; gap: 5rem; }
-  .hero-left { flex: 1; }
-  .hero-badge {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: rgba(108,99,255,0.15); border: 1px solid rgba(108,99,255,0.3);
-    color: var(--indigo-light); padding: 0.4rem 1rem; border-radius: 50px;
-    font-size: 0.82rem; font-weight: 500; margin-bottom: 1.8rem;
-    animation: fadeUp 0.6s ease both;
-  }
-  .hero-badge span { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-  h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(2.8rem, 6vw, 5rem);
-    font-weight: 800; line-height: 1.05;
-    animation: fadeUp 0.7s 0.1s ease both;
-  }
-  h1 em { font-style: normal; color: var(--indigo-light); }
-  h1 .amber { color: var(--amber); }
-  .hero-sub {
-    margin-top: 1.5rem; color: var(--muted);
-    font-size: 1.1rem; line-height: 1.7; max-width: 480px;
-    animation: fadeUp 0.7s 0.2s ease both;
-  }
-  .hero-btns {
-    margin-top: 2.5rem; display: flex; gap: 1rem; flex-wrap: wrap;
-    animation: fadeUp 0.7s 0.3s ease both;
-  }
-  .btn-primary {
-    background: var(--indigo); color: #fff;
-    padding: 0.85rem 2rem; border-radius: 50px;
-    font-size: 1rem; font-weight: 600; border: none; cursor: pointer;
-    transition: all 0.25s; text-decoration: none; display: inline-block;
-  }
-  .btn-primary:hover { background: var(--indigo-light); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(108,99,255,0.35); }
-  .btn-outline {
-    background: transparent; color: var(--text);
-    padding: 0.85rem 2rem; border-radius: 50px;
-    font-size: 1rem; font-weight: 500;
-    border: 1px solid var(--border); cursor: pointer;
-    transition: all 0.25s; text-decoration: none; display: inline-block;
-  }
-  .btn-outline:hover { border-color: var(--indigo); color: var(--indigo-light); }
-  .hero-stats {
-    margin-top: 3rem; display: flex; gap: 2.5rem;
-    animation: fadeUp 0.7s 0.4s ease both;
-  }
-  .stat-num { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; color: var(--text); }
-  .stat-label { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
-
-  /* hero card */
-  .hero-right { flex: 0 0 340px; animation: fadeUp 0.8s 0.2s ease both; }
-  .match-card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 1.8rem;
-    backdrop-filter: blur(20px);
-  }
-  .match-card-title { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; }
-  .skill-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.7rem; }
-  .skill-tag {
-    background: rgba(108,99,255,0.15); border: 1px solid rgba(108,99,255,0.25);
-    color: var(--indigo-light); padding: 0.35rem 0.9rem; border-radius: 50px;
-    font-size: 0.82rem;
-  }
-  .skill-tag.want { background: rgba(245,166,35,0.1); border-color: rgba(245,166,35,0.3); color: var(--amber); }
-  .arrow-icon { color: var(--muted); font-size: 1.1rem; }
-  .match-found {
-    margin-top: 1.2rem; background: rgba(34,212,122,0.08);
-    border: 1px solid rgba(34,212,122,0.25);
-    border-radius: 12px; padding: 1rem;
-    display: flex; align-items: center; gap: 0.8rem;
-  }
-  .match-avatar {
-    width: 40px; height: 40px; border-radius: 50%;
-    background: linear-gradient(135deg, #6c63ff, #f5a623);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.1rem; flex-shrink: 0;
-  }
-  .match-text { font-size: 0.82rem; line-height: 1.5; }
-  .match-text strong { color: var(--green); font-size: 0.75rem; display: block; margin-bottom: 2px; }
-  .typing-dots { display: inline-flex; gap: 3px; margin-top: 0.6rem; }
-  .typing-dots span { width: 6px; height: 6px; background: var(--indigo); border-radius: 50%; animation: dot 1.2s infinite; }
-  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes dot { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
-
-  @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
-
-  /* ── LOGOS ── */
-  .logos-bar {
-    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
-    padding: 1.5rem 5%;
-    display: flex; align-items: center; justify-content: center; gap: 3rem;
-    overflow: hidden;
-  }
-  .logos-label { font-size: 0.75rem; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
-  .logos-track { display: flex; gap: 3rem; animation: scroll 20s linear infinite; }
-  .logo-item { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; color: rgba(255,255,255,0.2); white-space: nowrap; }
-  @keyframes scroll { from{transform:translateX(0)} to{transform:translateX(-50%)} }
-
-  /* ── SECTION COMMON ── */
-  section { padding: 6rem 5%; }
-  .section-label {
-    font-size: 0.75rem; color: var(--indigo-light); text-transform: uppercase;
-    letter-spacing: 2px; font-weight: 600; margin-bottom: 1rem;
-  }
-  .section-title {
-    font-family: 'Syne', sans-serif; font-size: clamp(2rem, 4vw, 3rem);
-    font-weight: 800; line-height: 1.15;
-  }
-  .section-sub { color: var(--muted); margin-top: 0.8rem; font-size: 1rem; line-height: 1.7; max-width: 500px; }
-  .section-inner { max-width: 1100px; margin: 0 auto; }
-
-  /* ── HOW IT WORKS ── */
-  .how { background: var(--bg2); }
-  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2rem; margin-top: 3.5rem; }
-  .step {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 2rem;
-    position: relative; transition: transform 0.3s, border-color 0.3s;
-  }
-  .step:hover { transform: translateY(-4px); border-color: rgba(108,99,255,0.3); }
-  .step-num {
-    font-family: 'Syne', sans-serif; font-size: 3rem; font-weight: 800;
-    color: rgba(108,99,255,0.15); line-height: 1;
-  }
-  .step-icon { font-size: 1.8rem; margin: 0.5rem 0; }
-  .step h3 { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
-  .step p { color: var(--muted); font-size: 0.88rem; line-height: 1.6; }
-
-  /* ── SKILLS PREVIEW ── */
-  .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; margin-top: 3.5rem; }
-  .skill-card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: var(--radius); overflow: hidden;
-    transition: transform 0.3s, border-color 0.3s;
-    text-decoration: none; color: inherit;
-    display: block;
-  }
-  .skill-card:hover { transform: translateY(-5px); border-color: rgba(108,99,255,0.35); }
-  .skill-card-thumb {
-    height: 120px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 3.5rem;
-    position: relative; overflow: hidden;
-  }
-  .skill-card-thumb::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.3); }
-  .skill-card-body { padding: 1.3rem; }
-  .skill-card-cat { font-size: 0.7rem; color: var(--indigo-light); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.4rem; }
-  .skill-card-name { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; }
-  .skill-card-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 0.8rem; }
-  .skill-card-learners { font-size: 0.78rem; color: var(--muted); }
-  .skill-badge { font-size: 0.7rem; padding: 0.25rem 0.7rem; border-radius: 50px; font-weight: 600; }
-  .badge-free { background: rgba(34,212,122,0.15); color: var(--green); border: 1px solid rgba(34,212,122,0.3); }
-  .badge-pro { background: rgba(245,166,35,0.15); color: var(--amber); border: 1px solid rgba(245,166,35,0.3); }
-  .view-all-wrap { text-align: center; margin-top: 2.5rem; }
-
-  /* ── FEATURES ── */
-  .features { background: var(--bg); }
-  .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 3.5rem; }
-  .feature-card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 2rem;
-    transition: transform 0.3s, border-color 0.3s;
-  }
-  .feature-card:hover { transform: translateY(-4px); border-color: rgba(108,99,255,0.3); }
-  .feature-icon { font-size: 2rem; margin-bottom: 1rem; }
-  .feature-card h3 { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
-  .feature-card p { color: var(--muted); font-size: 0.88rem; line-height: 1.6; }
-  .feature-link { display: inline-flex; align-items: center; gap: 5px; color: var(--indigo-light); font-size: 0.85rem; text-decoration: none; margin-top: 1rem; transition: gap 0.2s; }
-  .feature-link:hover { gap: 10px; }
-
-  /* ── TESTIMONIALS ── */
-  .testimonials { background: var(--bg2); }
-  .testi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 3.5rem; }
-  .testi-card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 1.8rem;
-    transition: transform 0.3s, border-color 0.3s;
-  }
-  .testi-card:hover { transform: translateY(-4px); border-color: rgba(108,99,255,0.3); }
-  .testi-stars { color: var(--amber); font-size: 0.9rem; margin-bottom: 1rem; }
-  .testi-quote { color: #d0d0ee; font-size: 0.93rem; line-height: 1.7; font-style: italic; margin-bottom: 1.5rem; }
-  .testi-author { display: flex; align-items: center; gap: 0.9rem; }
-  .testi-avatar {
-    width: 44px; height: 44px; border-radius: 50%;
-    background: linear-gradient(135deg, #6c63ff, #22d47a);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.2rem; flex-shrink: 0; border: 2px solid var(--border);
-  }
-  .testi-avatar.a2 { background: linear-gradient(135deg, #f5a623, #ff6b6b); }
-  .testi-avatar.a3 { background: linear-gradient(135deg, #22d47a, #6c63ff); }
-  .testi-avatar.a4 { background: linear-gradient(135deg, #ff6b9d, #f5a623); }
-  .testi-avatar.a5 { background: linear-gradient(135deg, #00d2ff, #6c63ff); }
-  .testi-avatar.a6 { background: linear-gradient(135deg, #a8ff78, #78ffd6); }
-  .testi-name { font-weight: 600; font-size: 0.9rem; }
-  .testi-role { color: var(--muted); font-size: 0.78rem; }
-  .testi-swap { display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem; color: var(--indigo-light); background: rgba(108,99,255,0.1); padding: 0.2rem 0.6rem; border-radius: 50px; margin-top: 0.3rem; }
-
-  /* ── PRICING ── */
-  .pricing { background: var(--bg); }
-  .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 3.5rem; max-width: 800px; margin-left: auto; margin-right: auto; }
-  .price-card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 2.5rem;
-    transition: transform 0.3s;
-  }
-  .price-card.popular {
-    background: linear-gradient(145deg, rgba(108,99,255,0.2), rgba(108,99,255,0.05));
-    border-color: rgba(108,99,255,0.4);
-    transform: scale(1.02);
-  }
-  .price-card:hover { transform: translateY(-4px); }
-  .price-card.popular:hover { transform: scale(1.02) translateY(-4px); }
-  .popular-tag { background: var(--indigo); color: #fff; font-size: 0.72rem; font-weight: 700; padding: 0.25rem 0.8rem; border-radius: 50px; display: inline-block; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 1px; }
-  .price-name { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800; }
-  .price-amount { font-family: 'Syne', sans-serif; font-size: 3rem; font-weight: 800; margin: 1rem 0; }
-  .price-amount span { font-size: 1rem; color: var(--muted); font-family: 'DM Sans', sans-serif; font-weight: 400; }
-  .price-desc { color: var(--muted); font-size: 0.85rem; margin-bottom: 1.5rem; }
-  .price-features { list-style: none; display: flex; flex-direction: column; gap: 0.7rem; margin-bottom: 2rem; }
-  .price-features li { font-size: 0.88rem; display: flex; align-items: center; gap: 0.6rem; }
-  .price-features li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
-  .price-features li.no::before { content: '✕'; color: #ff6b6b; }
-  .price-features li.no { color: var(--muted); }
-
-  /* ── CTA ── */
-  .cta-section {
-    background: linear-gradient(135deg, rgba(108,99,255,0.15) 0%, rgba(245,166,35,0.08) 100%);
-    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
-    text-align: center; padding: 6rem 5%;
-  }
-  .cta-section h2 { font-family: 'Syne', sans-serif; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; }
-  .cta-section p { color: var(--muted); margin-top: 1rem; font-size: 1.05rem; }
-  .cta-section .hero-btns { justify-content: center; margin-top: 2.5rem; }
-
-  /* ── FOOTER ── */
-  footer {
-    background: var(--bg2); border-top: 1px solid var(--border);
-    padding: 4rem 5% 2rem;
-  }
-  .footer-inner { max-width: 1100px; margin: 0 auto; }
-  .footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 3rem; }
-  .footer-brand p { color: var(--muted); font-size: 0.88rem; line-height: 1.7; margin-top: 0.8rem; max-width: 260px; }
-  .footer-col h4 { font-family: 'Syne', sans-serif; font-size: 0.85rem; font-weight: 700; margin-bottom: 1rem; color: var(--text); }
-  .footer-col a { display: block; color: var(--muted); text-decoration: none; font-size: 0.85rem; margin-bottom: 0.6rem; transition: color 0.2s; }
-  .footer-col a:hover { color: var(--indigo-light); }
-  .footer-bottom { border-top: 1px solid var(--border); padding-top: 2rem; display: flex; justify-content: space-between; align-items: center; }
-  .footer-bottom p { color: var(--muted); font-size: 0.82rem; }
-  .footer-socials { display: flex; gap: 1rem; }
-  .footer-socials a { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.2s; }
-  .footer-socials a:hover { color: var(--indigo-light); }
-
-  /* ── SCROLL REVEAL ── */
-  .reveal { opacity: 0; transform: translateY(30px); transition: all 0.6s ease; }
-  .reveal.visible { opacity: 1; transform: translateY(0); }
-
-  /* ── RESPONSIVE ── */
-  @media (max-width: 900px) {
-    .hero-inner { flex-direction: column; gap: 3rem; }
-    .hero-right { flex: none; width: 100%; max-width: 400px; }
-    .nav-links { display: none; }
-    .hamburger { display: flex; }
-    .footer-top { grid-template-columns: 1fr 1fr; }
-  }
-  @media (max-width: 600px) {
-    .hero-stats { gap: 1.5rem; }
-    .footer-top { grid-template-columns: 1fr; }
-    .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
-  }
+html{
+  scroll-behavior:smooth;
+}
 </style>
 </head>
-<body>
 
-<!-- NAV -->
-<nav>
-  <a href="index.html" class="nav-logo">SkillSwap</a>
-  <ul class="nav-links">
-    <li><a href="#how">How it Works</a></li>
-    <li><a href="skills.html">Browse Skills</a></li>
-    <li><a href="community.html">Community</a></li>
-    <li><a href="sessions.html">Sessions</a></li>
-    <li><a href="leaderboard.html">Leaderboard</a></li>
-    <li><a href=" .html"> </a></li>
-    <li><a href="dashboard.html">Dashboard</a></li>
-    <li><a href="#pricing" class="nav-cta">Get Started</a></li>
-  </ul>
-  <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
-    <span></span><span></span><span></span>
-  </button>
+<body class="bg-white text-gray-900">
+
+<nav class="fixed top-0 w-full bg-white/90 backdrop-blur border-b z-50">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+
+    <h1 class="text-2xl font-bold text-purple-600">
+      SkillSwap
+    </h1>
+
+    <div class="hidden md:flex gap-8">
+      <a href="#product" class="hover:text-purple-600">Product</a>
+      <a href="#features" class="hover:text-purple-600">Features</a>
+      <a href="#testimonials" class="hover:text-purple-600">Testimonials</a>
+      <a href="#pricing" class="hover:text-purple-600">Pricing</a>
+    </div>
+
+    <button class="bg-purple-600 text-white px-5 py-2 rounded-xl">
+      Get Started
+    </button>
+
+  </div>
 </nav>
-<div class="mobile-menu" id="mobileMenu">
-  <a href="#how">How it Works</a>
-  <a href="skills.html">Browse Skills</a>
-  <a href="community.html">Community</a>
-  <a href="sessions.html">Sessions</a>
-  <a href="leaderboard.html">Leaderboard</a>
-  <a href=" .html"> </a>
-  <a href="dashboard.html">Dashboard</a>
-  <a href="#pricing">Pricing</a>
-</div>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-glow"></div>
-  <div class="hero-glow2"></div>
-  <div class="hero-inner">
-    <div class="hero-left">
-      <div class="hero-badge"><span></span> Now live — 12,000+ learners worldwide</div>
-      <h1>Turn Your Skills Into<br><em>Learning</em> <span class="amber">Opportunities</span></h1>
-      <p class="hero-sub">Exchange skills for free, book expert mentors, and unlock unlimited learning requests. One platform. Infinite growth.</p>
-      <div class="hero-btns">
-        <a href="skills.html" class="btn-primary">Explore Skills →</a>
-        <a href="#how" class="btn-outline">How it Works</a>
-      </div>
-      <div class="hero-stats">
-        <div><div class="stat-num">12K+</div><div class="stat-label">Active Learners</div></div>
-        <div><div class="stat-num">400+</div><div class="stat-label">Skills Available</div></div>
-        <div><div class="stat-num">96%</div><div class="stat-label">Match Rate</div></div>
-      </div>
+<section class="pt-36 pb-24 bg-gradient-to-b from-purple-50 to-white">
+
+  <div class="max-w-6xl mx-auto px-6 text-center">
+
+    <span class="bg-purple-100 text-purple-700 px-4 py-2 rounded-full text-sm">
+      Learn through skill swaps or paid sessions
+    </span>
+
+    <h1 class="text-5xl md:text-7xl font-bold mt-6 max-w-4xl mx-auto leading-tight">
+      Turn Your Skills Into
+      <span class="text-purple-600">Learning Opportunities</span>
+    </h1>
+
+    <p class="mt-6 text-lg text-gray-600 max-w-2xl mx-auto">
+      Exchange skills for free, book expert mentors, and upgrade to
+      unlimited learning requests with SkillSwap Pro.
+    </p>
+
+    <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4">
+      <button class="bg-purple-600 text-white px-6 py-3 rounded-xl">
+        Start Free
+      </button>
+
+      <button class="border px-6 py-3 rounded-xl">
+        Watch Demo
+      </button>
     </div>
-    <div class="hero-right">
-      <div class="match-card">
-        <div class="match-card-title">⚡ Live Skill Match</div>
-        <div class="skill-row">
-          <div class="skill-tag">💻 React Dev</div>
-          <div class="arrow-icon">⇄</div>
-          <div class="skill-tag want">🇰🇷 Korean</div>
-        </div>
-        <div class="skill-row">
-          <div class="skill-tag">🎨 UI Design</div>
-          <div class="arrow-icon">⇄</div>
-          <div class="skill-tag want">📸 Photography</div>
-        </div>
-        <div class="skill-row">
-          <div class="skill-tag">🎤 Singing</div>
-          <div class="arrow-icon">⇄</div>
-          <div class="skill-tag want">📈 Marketing</div>
-        </div>
-        <div class="match-found">
-          <div class="match-avatar">👩</div>
-          <div class="match-text">
-            <strong>🎉 MATCH FOUND!</strong>
-            Sarah teaches Korean &amp; wants to learn React. She's online now!
-          </div>
-        </div>
-        <div style="text-align:center;margin-top:1rem">
-          <div class="typing-dots"><span></span><span></span><span></span></div>
-          <div style="color:var(--muted);font-size:0.75rem;margin-top:0.4rem">Finding 3 more matches…</div>
-        </div>
-      </div>
+
+    <div class="mt-10 flex justify-center gap-8 text-gray-500 text-sm">
+      <span>5 Free Requests</span>
+      <span>Skill Swaps</span>
+      <span>Paid Mentorship</span>
     </div>
+
   </div>
+
 </section>
 
-<!-- LOGOS -->
-<div class="logos-bar">
-  <span class="logos-label">Skills people are learning</span>
-  <div class="logos-track">
-    <span class="logo-item">UI/UX Design</span>
-    <span class="logo-item">Python</span>
-    <span class="logo-item">Digital Marketing</span>
-    <span class="logo-item">Video Editing</span>
-    <span class="logo-item">Photography</span>
-    <span class="logo-item">Music Production</span>
-    <span class="logo-item">Copywriting</span>
-    <span class="logo-item">Korean</span>
-    <span class="logo-item">React</span>
-    <span class="logo-item">Finance</span>
-    <span class="logo-item">UI/UX Design</span>
-    <span class="logo-item">Python</span>
-    <span class="logo-item">Digital Marketing</span>
-    <span class="logo-item">Video Editing</span>
-    <span class="logo-item">Photography</span>
-    <span class="logo-item">Music Production</span>
-    <span class="logo-item">Copywriting</span>
-    <span class="logo-item">Korean</span>
-    <span class="logo-item">React</span>
-    <span class="logo-item">Finance</span>
-  </div>
-</div>
+<section id="product" class="pb-24">
 
-<!-- HOW IT WORKS -->
-<section class="how" id="how">
-  <div class="section-inner">
-    <div class="section-label">Process</div>
-    <div class="section-title">How SkillSwap Works</div>
-    <p class="section-sub">Get matched, swap knowledge, and grow together — in three simple steps.</p>
-    <div class="steps">
-      <div class="step reveal">
-        <div class="step-num">01</div>
-        <div class="step-icon">🧑‍💼</div>
-        <h3>Create Your Profile</h3>
-        <p>List the skills you can teach and what you want to learn. Our algorithm finds your ideal matches instantly.</p>
+  <div class="max-w-5xl mx-auto px-6">
+
+    <div class="bg-white border shadow-xl rounded-3xl p-8">
+
+      <div class="flex gap-2 mb-6">
+        <div class="w-3 h-3 bg-red-400 rounded-full"></div>
+        <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
+        <div class="w-3 h-3 bg-green-400 rounded-full"></div>
       </div>
-      <div class="step reveal">
-        <div class="step-num">02</div>
-        <div class="step-icon">🔄</div>
-        <h3>Get Matched</h3>
-        <p>We pair you with people who have complementary skills. Free swaps or paid sessions — your choice.</p>
+
+      <div class="grid md:grid-cols-2 gap-6">
+
+        <div class="bg-purple-50 p-6 rounded-2xl">
+          <h3 class="font-bold mb-3">Skills I Teach</h3>
+          <p>💻 React Development</p>
+          <p>🎨 UI Design</p>
+          <p>🎤 Singing </p>
+        </div>
+
+        <div class="bg-purple-50 p-6 rounded-2xl">
+          <h3 class="font-bold mb-3">Skills I Want</h3>
+          <p>🇰🇷 Korean</p>
+          <p>📸 Photography</p>
+          <p>📈 Marketing</p>
+        </div>
+
       </div>
-      <div class="step reveal">
-        <div class="step-num">03</div>
-        <div class="step-icon">📹</div>
-        <h3>Learn Together</h3>
-        <p>Schedule sessions, hop on video calls, share resources, and track your progress on your dashboard.</p>
+
+      <div class="mt-6 bg-green-50 border border-green-200 p-5 rounded-2xl">
+        🎉 Match Found! Sarah teaches Korean and wants to learn React.
       </div>
-      <div class="step reveal">
-        <div class="step-num">04</div>
-        <div class="step-icon">🏆</div>
-        <h3>Earn & Grow</h3>
-        <p>Complete sessions, earn badges, climb the leaderboard, and build your reputation in the community.</p>
-      </div>
+
     </div>
+
   </div>
+
 </section>
 
-<!-- SKILLS PREVIEW -->
-<section style="background:var(--bg);" id="skills">
-  <div class="section-inner">
-    <div class="section-label">Browse</div>
-    <div class="section-title">Popular Skills</div>
-    <p class="section-sub">From tech to creative arts — find exactly what you want to learn next.</p>
-    <div class="skills-grid">
-      <a href="skills.html" class="skill-card reveal">
-        <div class="skill-card-thumb" style="background:linear-gradient(135deg,#1a1a3e,#6c63ff);">📱</div>
-        <div class="skill-card-body">
-          <div class="skill-card-cat">Technology</div>
-          <div class="skill-card-name">UI/UX Design</div>
-          <p style="color:var(--muted);font-size:0.82rem;">Figma, wireframing, prototyping & user research</p>
-          <div class="skill-card-meta"><span class="skill-card-learners">👤 2.1k learners</span><span class="skill-badge badge-free">Free</span></div>
-        </div>
-      </a>
-      <a href="skills.html" class="skill-card reveal">
-        <div class="skill-card-thumb" style="background:linear-gradient(135deg,#0f2027,#203a43);">📈</div>
-        <div class="skill-card-body">
-          <div class="skill-card-cat">Marketing</div>
-          <div class="skill-card-name">Digital Marketing</div>
-          <p style="color:var(--muted);font-size:0.82rem;">SEO, paid ads, social media & analytics</p>
-          <div class="skill-card-meta"><span class="skill-card-learners">👤 3.4k learners</span><span class="skill-badge badge-free">Free</span></div>
-        </div>
-      </a>
-      <a href="skills.html" class="skill-card reveal">
-        <div class="skill-card-thumb" style="background:linear-gradient(135deg,#1a0533,#ff6b6b);">🎬</div>
-        <div class="skill-card-body">
-          <div class="skill-card-cat">Creative</div>
-          <div class="skill-card-name">Video Editing</div>
-          <p style="color:var(--muted);font-size:0.82rem;">Premiere Pro, After Effects, color grading</p>
-          <div class="skill-card-meta"><span class="skill-card-learners">👤 1.8k learners</span><span class="skill-badge badge-pro">Pro</span></div>
-        </div>
-      </a>
-      <a href="skills.html" class="skill-card reveal">
-        <div class="skill-card-thumb" style="background:linear-gradient(135deg,#0d3b2e,#22d47a);">🐍</div>
-        <div class="skill-card-body">
-          <div class="skill-card-cat">Technology</div>
-          <div class="skill-card-name">Python Programming</div>
-          <p style="color:var(--muted);font-size:0.82rem;">Automation, data science & web development</p>
-          <div class="skill-card-meta"><span class="skill-card-learners">👤 4.2k learners</span><span class="skill-badge badge-free">Free</span></div>
-        </div>
-      </a>
-      <a href="skills.html" class="skill-card reveal">
-        <div class="skill-card-thumb" style="background:linear-gradient(135deg,#1a1200,#f5a623);">📸</div>
-        <div class="skill-card-body">
-          <div class="skill-card-cat">Creative</div>
-          <div class="skill-card-name">Photography</div>
-          <p style="color:var(--muted);font-size:0.82rem;">Composition, lighting, editing & gear</p>
-          <div class="skill-card-meta"><span class="skill-card-learners">👤 1.5k learners</span><span class="skill-badge badge-free">Free</span></div>
-        </div>
-      </a>
-      <a href="skills.html" class="skill-card reveal">
-        <div class="skill-card-thumb" style="background:linear-gradient(135deg,#0a0a2e,#00d2ff);">🎵</div>
-        <div class="skill-card-body">
-          <div class="skill-card-cat">Music</div>
-          <div class="skill-card-name">Music Production</div>
-          <p style="color:var(--muted);font-size:0.82rem;">Beats, mixing, mastering & DAW workflow</p>
-          <div class="skill-card-meta"><span class="skill-card-learners">👤 980 learners</span><span class="skill-badge badge-pro">Pro</span></div>
-        </div>
-      </a>
+<section id="features" class="py-20 bg-purple-50">
+
+  <div class="max-w-5xl mx-auto px-6">
+
+    <h2 class="text-4xl font-bold text-center mb-12">
+      Why SkillSwap?
+    </h2>
+
+    <div class="grid md:grid-cols-3 gap-8">
+
+      <div class="bg-white p-6 rounded-2xl shadow-sm">
+        <h3 class="font-bold text-xl mb-2">
+          🔄 Skill Swaps
+        </h3>
+        <p class="text-gray-600">
+          Learn new skills without spending money.
+        </p>
+      </div>
+
+      <div class="bg-white p-6 rounded-2xl shadow-sm">
+        <h3 class="font-bold text-xl mb-2">
+          💸 Paid Mentorship
+        </h3>
+        <p class="text-gray-600">
+          Book sessions directly with experts.
+        </p>
+      </div>
+
+      <div class="bg-white p-6 rounded-2xl shadow-sm">
+        <h3 class="font-bold text-xl mb-2">
+          🚀 Unlimited Requests
+        </h3>
+        <p class="text-gray-600">
+          Upgrade to Pro for unlimited learning.
+        </p>
+      </div>
+
     </div>
-    <div class="view-all-wrap reveal">
-      <a href="skills.html" class="btn-outline">View All 400+ Skills →</a>
-    </div>
+
   </div>
+
 </section>
 
-<!-- FEATURES -->
-<section class="features" id="features">
-  <div class="section-inner">
-    <div class="section-label">Features</div>
-    <div class="section-title">Everything You Need to Grow</div>
-    <div class="features-grid">
-      <div class="feature-card reveal">
-        <div class="feature-icon">🔄</div>
-        <h3>Skill Swaps</h3>
-        <p>Exchange your expertise for someone else's. No money needed — just knowledge. Free users get 5 swaps/month.</p>
-        <a href="skills.html" class="feature-link">Explore swaps →</a>
-      </div>
-      <div class="feature-card reveal">
-        <div class="feature-icon">💸</div>
-        <h3>Paid Mentorship</h3>
-        <p>Book 1:1 sessions with verified experts at transparent rates. Escrow-protected payments, no surprises.</p>
-        <a href="sessions.html" class="feature-link">Book a session →</a>
-      </div>
-      <div class="feature-card reveal">
-        <div class="feature-icon">🏆</div>
-        <h3>Leaderboard</h3>
-        <p>Compete, earn badges, and rank among the top learners and teachers in the SkillSwap universe.</p>
-        <a href="leaderboard.html" class="feature-link">See rankings →</a>
-      </div>
-      <div class="feature-card reveal">
-        <div class="feature-icon">💬</div>
-        <h3>Real-time  </h3>
-        <p>Chat instantly with your matches, share files, schedule sessions, and keep all conversations in one place.</p>
-        <a href=" .html" class="feature-link">Open   →</a>
-      </div>
-      <div class="feature-card reveal">
-        <div class="feature-icon">🌐</div>
-        <h3>Community Hub</h3>
-        <p>Join discussions, share wins, ask questions, and connect with a global community of 12,000+ learners.</p>
-        <a href="community.html" class="feature-link">Join community →</a>
-      </div>
-      <div class="feature-card reveal">
-        <div class="feature-icon">📊</div>
-        <h3>Personal Dashboard</h3>
-        <p>Track your learning streak, completed sessions, earned badges, and skill progress all in one view.</p>
-        <a href="dashboard.html" class="feature-link">View dashboard →</a>
-      </div>
-    </div>
-  </div>
-</section>
+<section id="testimonials" class="py-24 bg-white">
 
-<!-- TESTIMONIALS -->
-<section class="testimonials" id="testimonials">
-  <div class="section-inner">
-    <div class="section-label">Social Proof</div>
-    <div class="section-title">Loved by Learners Worldwide</div>
-    <p class="section-sub">Real people, real swaps, real growth. Here's what they're saying.</p>
-    <div class="testi-grid">
+  <div class="max-w-6xl mx-auto px-6">
 
-      <div class="testi-card reveal">
-        <div class="testi-stars">★★★★★</div>
-        <p class="testi-quote">"I swapped my React knowledge for Korean lessons and now I'm conversational after just 3 months! SkillSwap is genuinely life-changing. Best platform I've found."</p>
-        <div class="testi-author">
-          <div class="testi-avatar">👩‍💻</div>
-          <div>
-            <div class="testi-name">Priya Sharma</div>
-            <div class="testi-role">Frontend Developer, Bengaluru</div>
-            <div class="testi-swap">🔄 React ↔ Korean</div>
-          </div>
+    <h2 class="text-4xl font-bold text-center mb-4">
+      Loved by Learners Worldwide
+    </h2>
+    <p class="text-gray-500 text-center mb-16 max-w-md mx-auto">
+      See how our community is trading knowledge and mastering new abilities.
+    </p>
+
+    <div class="grid md:grid-cols-3 gap-8">
+
+      <div class="flex flex-col items-start border p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+        <img 
+          src="./jee.jpeg" 
+          alt="Jeetandar N Silwani" 
+          class="w-20 h-20 object-cover rounded-xl border mb-4"
+        >
+        <div>
+          <h4 class="font-bold text-lg">Jeetandar N Silwani</h4>
+          <p class="text-purple-600 text-sm mb-3">UI/UX Designer</p>
+          <p class="text-gray-600 leading-relaxed">
+            "I traded my design knowledge for Spanish lessons with an absolute pro. SkillSwap saved me thousands of rupees and connected me with an incredible mentor!"
+          </p>
         </div>
       </div>
 
-      <div class="testi-card reveal">
-        <div class="testi-stars">★★★★★</div>
-        <p class="testi-quote">"Booked a paid session with a top UI designer and got feedback that completely transformed my portfolio. Landed my dream job two weeks later. Worth every rupee."</p>
-        <div class="testi-author">
-          <div class="testi-avatar a2">🧑‍🎨</div>
-          <div>
-            <div class="testi-name">Arjun Mehta</div>
-            <div class="testi-role">Product Designer, Mumbai</div>
-            <div class="testi-swap">💸 Paid Session</div>
-          </div>
+      <div class="flex flex-col items-start border p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+        <img 
+          src="./naf.jpeg" 
+          alt="Naful" 
+          class="w-20 h-20 object-cover rounded-xl border mb-4"
+        >
+        <div>
+          <h4 class="font-bold text-lg">Naful</h4>
+          <p class="text-purple-600 text-sm mb-3">Backend Developer</p>
+          <p class="text-gray-600 leading-relaxed">
+            "The Pro plan is easily worth it. Getting priority matching helped me find a React tutor in under an hour. Highly recommend this to all tech learners!"
+          </p>
         </div>
       </div>
 
-      <div class="testi-card reveal">
-        <div class="testi-stars">★★★★★</div>
-        <p class="testi-quote">"The leaderboard got me hooked. I went from casual learner to top 50 in my city in a month. The community here is incredibly supportive — nothing like it."</p>
-        <div class="testi-author">
-          <div class="testi-avatar a3">👨‍🎓</div>
-          <div>
-            <div class="testi-name">Rahul Verma</div>
-            <div class="testi-role">Student, Delhi</div>
-            <div class="testi-swap">🏆 Top 50 Learner</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="testi-card reveal">
-        <div class="testi-stars">★★★★★</div>
-        <p class="testi-quote">"I teach photography and learn video editing in return. It's literally free education. The match quality is insane — they really understand what you're looking for."</p>
-        <div class="testi-author">
-          <div class="testi-avatar a4">👩‍🎬</div>
-          <div>
-            <div class="testi-name">Meera Patel</div>
-            <div class="testi-role">Photographer, Ahmedabad</div>
-            <div class="testi-swap">🔄 Photography ↔ Video Editing</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="testi-card reveal">
-        <div class="testi-stars">★★★★★</div>
-        <p class="testi-quote">"The messaging and scheduling is seamless. I've had 20+ sessions and never had a no-show. Pro plan is 100% worth it for the unlimited access alone."</p>
-        <div class="testi-author">
-          <div class="testi-avatar a5">🧑‍💼</div>
-          <div>
-            <div class="testi-name">Kevin D'Souza</div>
-            <div class="testi-role">Marketing Manager, Pune</div>
-            <div class="testi-swap">⭐ Pro Member</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="testi-card reveal">
-        <div class="testi-stars">★★★★★</div>
-        <p class="testi-quote">"As a teacher on SkillSwap, I earn side income doing what I love. I've had 80+ paid sessions and my profile gets me consistent bookings every single week."</p>
-        <div class="testi-author">
-          <div class="testi-avatar a6">👩‍🏫</div>
-          <div>
-            <div class="testi-name">Divya Nair</div>
-            <div class="testi-role">UX Mentor, Kochi</div>
-            <div class="testi-swap">💰 80+ Sessions Taught</div>
-          </div>
+      <div class="flex flex-col items-start border p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+        <img 
+          src="./ada.jpeg" 
+          alt="Adarsh" 
+          class="w-20 h-20 object-cover rounded-xl border mb-4"
+        >
+        <div>
+          <h4 class="font-bold text-lg">Adarsh</h4>
+          <p class="text-purple-600 text-sm mb-3">Content Creator</p>
+          <p class="text-gray-600 leading-relaxed">
+            "I was looking for basic video editing skills and swapped my digital marketing tips for them. This platform makes networking and learning feel effortless."
+          </p>
         </div>
       </div>
 
     </div>
-  </div>
-</section>
 
-<!-- PRICING -->
-<section class="pricing" id="pricing">
-  <div class="section-inner">
-    <div class="section-label">Plans</div>
-    <div class="section-title">Simple, Transparent Pricing</div>
-    <p class="section-sub">Start free. Upgrade when you're ready. Cancel anytime.</p>
-    <div class="pricing-grid">
-      <div class="price-card reveal">
-        <div class="price-name">Free</div>
-        <div class="price-amount">₹0</div>
-        <div class="price-desc">For casual learners getting started</div>
-        <ul class="price-features">
-          <li>5 Learning Requests/Month</li>
-          <li>Skill Swaps</li>
-          <li>Community Access</li>
-          <li>Basic Profile</li>
-          <li class="no">Priority Matching</li>
-          <li class="no">Unlimited Sessions</li>
-          <li class="no">Profile Boost</li>
+  </div>
+
+</section>
+<section id="pricing" class="py-24">
+
+  <div class="max-w-4xl mx-auto px-6">
+
+    <h2 class="text-4xl font-bold text-center mb-12">
+      Simple Pricing
+    </h2>
+
+    <div class="grid md:grid-cols-2 gap-6">
+
+      <div class="border rounded-3xl p-8">
+
+        <h3 class="text-2xl font-bold">
+          Free
+        </h3>
+
+        <p class="text-gray-500 mt-2">
+          For casual learners
+        </p>
+
+        <div class="text-5xl font-bold mt-6">
+          ₹0
+        </div>
+
+        <ul class="mt-6 space-y-2">
+          <li>✓ 5 Requests / Month</li>
+          <li>✓ Skill Swaps</li>
+          <li>✓ Community Access</li>
         </ul>
-        <a href="dashboard.html" class="btn-outline" style="width:100%;text-align:center;display:block;">Start Free</a>
+
       </div>
-      <div class="price-card popular reveal">
-        <div class="popular-tag">✦ Most Popular</div>
-        <div class="price-name">Pro</div>
-        <div class="price-amount">₹299<span>/mo</span></div>
-        <div class="price-desc">For serious learners who want it all</div>
-        <ul class="price-features">
-          <li>Unlimited Requests</li>
-          <li>Priority Matching</li>
-          <li>Community Access</li>
-          <li>Verified Badge</li>
-          <li>Profile Boost</li>
-          <li>Expert Booking</li>
-          <li>Advanced Analytics</li>
+
+      <div class="bg-purple-600 text-white rounded-3xl p-8">
+
+        <span class="bg-white text-purple-600 px-3 py-1 rounded-full text-sm font-bold">
+          POPULAR
+        </span>
+
+        <h3 class="text-2xl font-bold mt-4">
+          Pro
+        </h3>
+
+        <div class="text-5xl font-bold mt-6">
+          ₹299
+          <span class="text-lg">/mo</span>
+        </div>
+
+        <ul class="mt-6 space-y-2">
+          <li>✓ Unlimited Requests</li>
+          <li>✓ Priority Matching</li>
+          <li>✓ Profile Boost</li>
+          <li>✓ Expert Booking</li>
         </ul>
-        <a href="dashboard.html" class="btn-primary" style="width:100%;text-align:center;display:block;">Get Pro →</a>
+
       </div>
+
     </div>
+
   </div>
+
 </section>
 
-<!-- CTA -->
-<section class="cta-section">
-  <div style="max-width:700px;margin:0 auto;">
-    <h2>Knowledge Has Two Currencies.<br>Skills &amp; <span style="color:var(--amber)">Money.</span></h2>
-    <p>Join 12,000+ learners who are already swapping, growing, and earning on SkillSwap.</p>
-    <div class="hero-btns">
-      <a href="skills.html" class="btn-primary">Browse Skills →</a>
-      <a href="community.html" class="btn-outline">Join Community</a>
-    </div>
+<section class="py-24 bg-purple-600 text-white">
+
+  <div class="max-w-3xl mx-auto px-6 text-center">
+
+    <h2 class="text-5xl font-bold">
+      Knowledge Has Two Currencies
+    </h2>
+
+    <p class="mt-6 text-lg text-purple-100">
+      Skills and Money. Choose how you learn.
+    </p>
+
+    <button class="mt-8 bg-white text-purple-600 px-8 py-4 rounded-xl font-bold">
+      Join SkillSwap
+    </button>
+
   </div>
+
 </section>
 
-<!-- FOOTER -->
-<footer>
-  <div class="footer-inner">
-    <div class="footer-top">
-      <div class="footer-brand">
-        <a href="index.html" class="nav-logo" style="font-size:1.3rem;">SkillSwap</a>
-        <p>The peer-to-peer learning platform where knowledge is the currency. Learn, teach, and grow together.</p>
-      </div>
-      <div class="footer-col">
-        <h4>Platform</h4>
-        <a href="skills.html">Browse Skills</a>
-        <a href="sessions.html">Book Sessions</a>
-        <a href="community.html">Community</a>
-        <a href="leaderboard.html">Leaderboard</a>
-      </div>
-      <div class="footer-col">
-        <h4>Account</h4>
-        <a href="dashboard.html">Dashboard</a>
-        <a href=" .html"> </a>
-        <a href="#pricing">Pricing</a>
-      </div>
-      <div class="footer-col">
-        <h4>Company</h4>
-        <a href="#">About Us</a>
-        <a href="#">Blog</a>
-        <a href="#">Careers</a>
-        <a href="#">Contact</a>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <p>© 2026 SkillSwap. Learn • Teach • Earn</p>
-      <div class="footer-socials">
-        <a href="#">Twitter</a>
-        <a href="#">Instagram</a>
-        <a href="#">LinkedIn</a>
-        <a href="#">Discord</a>
-      </div>
-    </div>
-  </div>
+<footer class="bg-gray-900 text-white text-center py-8">
+  © 2026 SkillSwap. Learn • Teach • Earn
 </footer>
 
-<script>
-  function toggleMenu() {
-    document.getElementById('mobileMenu').classList.toggle('open');
-  }
-
-  // Scroll reveal
-  const reveals = document.querySelectorAll('.reveal');
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach((e, i) => {
-      if (e.isIntersecting) {
-        setTimeout(() => e.target.classList.add('visible'), i * 80);
-        observer.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.1 });
-  reveals.forEach(r => observer.observe(r));
-</script>
 </body>
 </html>
