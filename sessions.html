@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillSwap - Peer Sessions</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- RESET & GLOBAL STYLES --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: #080711; /* Match landing page dark theme */
+            color: #F3F4F6;
+            padding: 140px 24px 80px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Ambient Glow Backgrounds */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.1) 0%, rgba(0,0,0,0) 70%); /* Blue tint */
+            top: 15%;
+            left: -150px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, rgba(0,0,0,0) 70%);
+            bottom: 10%;
+            right: -100px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* --- NAVIGATION BAR STYLES --- */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background: rgba(8, 7, 17, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            z-index: 1000;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #FFFFFF;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #FFFFFF 60%, #8B5CF6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            list-style: none;
+            gap: 28px;
+        }
+
+        .nav-links li a {
+            color: #9CA3AF;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .nav-links li a:hover {
+            color: #FFFFFF;
+        }
+
+        .nav-cta {
+            background: #8B5CF6;
+            color: #FFFFFF !important;
+            padding: 10px 20px;
+            border-radius: 100px;
+            font-weight: 600 !important;
+            transition: all 0.3s ease !important;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
+        }
+
+        .nav-cta:hover {
+            background: #7C3AED;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 24px;
+            height: 18px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 1001;
+        }
+
+        .hamburger span {
+            width: 100%;
+            height: 2px;
+            background-color: #FFFFFF;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        /* --- SESSIONS CONTENT CONTAINER --- */
+        .sessions-container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-tag {
+            color: #38BDF8; /* Cyan/Blue accent tag */
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #FFFFFF 40%, #7DD3FC 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* --- SESSIONS SIDEBAR / CONTROLS LAYOUT --- */
+        .sessions-layout {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 40px;
+        }
+
+        /* Left Action Controls Panel */
+        .controls-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .create-session-btn {
+            background: linear-gradient(135deg, #8B5CF6 0%, #38BDF8 100%);
+            color: #FFFFFF;
+            padding: 16px 24px;
+            border-radius: 16px;
+            font-weight: 700;
+            text-align: center;
+            text-decoration: none;
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.25);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .create-session-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(139, 92, 246, 0.4);
+        }
+
+        .filter-box {
+            background: rgba(17, 16, 28, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 20px;
+            padding: 20px;
+        }
+
+        .filter-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .filter-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .filter-item a {
+            color: #9CA3AF;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .filter-item a:hover, .filter-item.active a {
+            color: #FFFFFF;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .filter-count {
+            font-size: 0.8rem;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 2px 8px;
+            border-radius: 6px;
+            color: #9CA3AF;
+        }
+
+        /* --- RIGHT CONTENT: SESSIONS CARDS LIST --- */
+        .sessions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .session-card {
+            background: rgba(17, 16, 28, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 24px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: all 0.3s ease;
+        }
+
+        .session-card:hover {
+            border-color: rgba(56, 189, 248, 0.3);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            transform: translateY(-2px);
+        }
+
+        .session-details {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .calendar-badge {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            width: 70px;
+            height: 75px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            text-align: center;
+        }
+
+        .cal-month {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #38BDF8;
+            letter-spacing: 1px;
+        }
+
+        .cal-day {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #FFFFFF;
+            margin-top: 2px;
+        }
+
+        .session-main-info h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 6px;
+        }
+
+        .session-meta-row {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .session-meta-item {
+            font-size: 0.85rem;
+            color: #9CA3AF;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .session-meta-item svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+            opacity: 0.6;
+        }
+
+        .swap-direction {
+            font-size: 0.85rem;
+            color: #E5E7EB;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 6px 14px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .swap-arrow {
+            color: #8B5CF6;
+            font-weight: bold;
+        }
+
+        /* Right side: Actions block */
+        .session-action-block {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #FFFFFF;
+            padding: 10px 24px;
+            border-radius: 100px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .action-btn:hover {
+            background: #FFFFFF;
+            color: #080711;
+            box-shadow: 0 8px 20px rgba(255, 255, 255, 0.15);
+        }
+
+        .action-btn.primary-action {
+            background: #38BDF8;
+            border-color: #38BDF8;
+            color: #080711;
+        }
+
+        .action-btn.primary-action:hover {
+            background: #0ea5e9;
+            color: #FFFFFF;
+            box-shadow: 0 8px 20px rgba(56, 189, 248, 0.25);
+        }
+
+        /* --- RESPONSIVE MEDIA QUERIES --- */
+        @media (max-width: 1024px) {
+            nav { padding: 0 24px; }
+            .nav-links { gap: 16px; }
+            .sessions-layout { grid-template-columns: 1fr; gap: 32px; }
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 120px 16px 60px 16px; }
+            .section-title { font-size: 2rem; }
+            .session-card { flex-direction: column; align-items: flex-start; padding: 24px; }
+            .session-action-block { width: 100%; text-align: left; flex-direction: row; }
+            .action-btn { flex-grow: 1; text-align: center; }
+            .hamburger { display: flex; }
+            
+            /* Responsive Mobile Menu Drawer */
+            .nav-links {
+                position: fixed;
+                top: 80px;
+                right: -100%;
+                width: 100%;
+                height: calc(100vh - 80px);
+                background: rgba(8, 7, 17, 0.96);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                flex-direction: column;
+                justify-content: flex-start;
+                padding: 40px 24px;
+                gap: 24px;
+                transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                border-top: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            .nav-links.active { right: 0; }
+            .nav-links li { width: 100%; text-align: center; }
+            .nav-links li a { font-size: 1.2rem; display: block; padding: 12px 0; }
+            .nav-cta { display: inline-block; width: 80%; margin: 20px auto 0 auto; }
+
+            .hamburger.active span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+            .hamburger.active span:nth-child(2) { opacity: 0; }
+            .hamburger.active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="nav-logo">SkillSwap</a>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#how">How it Works</a></li>
+            <li><a href="skills.html">Browse Skills</a></li>
+            <li><a href="community.html">Community</a></li>
+            <li><a href="sessions.html">Sessions</a></li>
+            <!-- <li><a href="leaderboard.html">Leaderboard</a></li> -->
+            <li><a href=" .html"> </a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="#pricing" class="nav-cta">Get Started</a></li>
+        </ul>
+        <button class="hamburger" id="hamburgerBtn" onclick="toggleMenu()" aria-label="Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </nav>
+
+    <main class="sessions-container">
+        
+        <div class="section-header">
+            <span class="section-tag">Peer Learning</span>
+            <h2 class="section-title">1-on-1 Knowledge Swaps</h2>
+        </div>
+
+        <div class="sessions-layout">
+            
+            <aside class="controls-panel">
+                <a href="#" class="create-session-btn">+ Request a Swap</a>
+                
+                <div class="filter-box">
+                    <h4 class="filter-title">Session Feeds</h4>
+                    <ul class="filter-list">
+                        <li class="filter-item active"><a href="#"><span>All Open Requests</span> <span class="filter-count">14</span></a></li>
+                        <li class="filter-item"><a href="#"><span>My Scheduled</span> <span class="filter-count">3</span></a></li>
+                        <li class="filter-item"><a href="#"><span>Completed</span> <span class="filter-count">28</span></a></li>
+                    </ul>
+                </div>
+            </aside>
+
+            <section class="sessions-list">
+                
+                <div class="session-card">
+                    <div class="session-details">
+                        <div class="calendar-badge">
+                            <span class="cal-month">Jun</span>
+                            <span class="cal-day">08</span>
+                        </div>
+                        <div class="session-main-info">
+                            <h3>Figma Advanced Components Layout Sync</h3>
+                            <div class="session-meta-row">
+                                <div class="session-meta-item">
+                                    <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm3.3 14.3L11 12.15V7h1.5v4.43l3.15 1.88-.65 1.01.01-.02z"/></svg>
+                                    <span>04:00 PM (45 mins)</span>
+                                </div>
+                                <div class="session-meta-item">
+                                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                                    <span>Intermediate Level</span>
+                                </div>
+                            </div>
+                            <div class="swap-direction">
+                                <span>Sarah teaches: <b>UI Design</b></span> 
+                                <span class="swap-arrow">⇄</span> 
+                                <span>Wants to learn: <b>React hooks</b></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="session-action-block">
+                        <a href="#" class="action-btn primary-action">Accept Swap</a>
+                    </div>
+                </div>
+
+                <div class="session-card">
+                    <div class="session-details">
+                        <div class="calendar-badge">
+                            <span class="cal-month">Jun</span>
+                            <span class="cal-day">10</span>
+                        </div>
+                        <div class="session-main-info">
+                            <h3>Database Architecture & Schema Building</h3>
+                            <div class="session-meta-row">
+                                <div class="session-meta-item">
+                                    <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm3.3 14.3L11 12.15V7h1.5v4.43l3.15 1.88-.65 1.01.01-.02z"/></svg>
+                                    <span>11:30 AM (60 mins)</span>
+                                </div>
+                                <div class="session-meta-item">
+                                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                                    <span>Advanced Level</span>
+                                </div>
+                            </div>
+                            <div class="swap-direction">
+                                <span>Alex teaches: <b>MySQL & Prisma</b></span> 
+                                <span class="swap-arrow">⇄</span> 
+                                <span>Wants to learn: <b>F1 Video Editing</b></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="session-action-block">
+                        <a href="#" class="action-btn primary-action">Accept Swap</a>
+                    </div>
+                </div>
+
+                <div class="session-card">
+                    <div class="session-details">
+                        <div class="calendar-badge">
+                            <span class="cal-month">Jun</span>
+                            <span class="cal-day">12</span>
+                        </div>
+                        <div class="session-main-info">
+                            <h3>Targeted Social Ads Campaign Setups</h3>
+                            <div class="session-meta-row">
+                                <div class="session-meta-item">
+                                    <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm3.3 14.3L11 12.15V7h1.5v4.43l3.15 1.88-.65 1.01.01-.02z"/></svg>
+                                    <span>06:00 PM (45 mins)</span>
+                                </div>
+                                <div class="session-meta-item">
+                                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                                    <span>Beginner Friendly</span>
+                                </div>
+                            </div>
+                            <div class="swap-direction">
+                                <span>Rohan teaches: <b>Digital Paid Ads</b></span> 
+                                <span class="swap-arrow">⇄</span> 
+                                <span>Wants to learn: <b>Python Automation</b></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="session-action-block">
+                        <a href="#" class="action-btn primary-action">Accept Swap</a>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+    </main>
+
+    <script>
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            
+            navLinks.classList.toggle('active');
+            hamburgerBtn.classList.toggle('active');
+        }
+
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                const navLinks = document.getElementById('navLinks');
+                const hamburgerBtn = document.getElementById('hamburgerBtn');
+                if(navLinks.classList.contains('active')) {
+                    navLinks.classList.remove('active');
+                    hamburgerBtn.classList.remove('active');
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
