@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillSwap - Community Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- RESET & GLOBAL STYLES --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: #080711; /* Match landing page dark theme */
+            color: #F3F4F6;
+            padding: 140px 24px 80px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Ambient Glow Backgrounds */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.12) 0%, rgba(0,0,0,0) 70%);
+            top: 5%;
+            right: -100px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(249, 115, 22, 0.05) 0%, rgba(0,0,0,0) 70%);
+            bottom: 5%;
+            left: -150px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* --- NAVIGATION BAR STYLES --- */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background: rgba(8, 7, 17, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            z-index: 1000;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #FFFFFF;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #FFFFFF 60%, #8B5CF6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            list-style: none;
+            gap: 28px;
+        }
+
+        .nav-links li a {
+            color: #9CA3AF;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .nav-links li a:hover {
+            color: #FFFFFF;
+        }
+
+        .nav-cta {
+            background: #8B5CF6;
+            color: #FFFFFF !important;
+            padding: 10px 20px;
+            border-radius: 100px;
+            font-weight: 600 !important;
+            transition: all 0.3s ease !important;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
+        }
+
+        .nav-cta:hover {
+            background: #7C3AED;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 24px;
+            height: 18px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 1001;
+        }
+
+        .hamburger span {
+            width: 100%;
+            height: 2px;
+            background-color: #FFFFFF;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        /* --- COMMUNITY HUBCONTAINER --- */
+        .community-container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-tag {
+            color: #F97316; /* Warm orange tag accent */
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #FFFFFF 40%, #FDBA74 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* --- FEATURED BANNER --- */
+        .featured-banner {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(249, 115, 22, 0.05) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 24px;
+            padding: 32px;
+            margin-bottom: 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .banner-content h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #FFFFFF;
+        }
+
+        .banner-content p {
+            color: #9CA3AF;
+            font-size: 0.95rem;
+        }
+
+        .join-btn {
+            background: #FFFFFF;
+            color: #080711;
+            padding: 12px 28px;
+            border-radius: 100px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .join-btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 20px rgba(255, 255, 255, 0.1);
+        }
+
+        /* --- MAIN TWO-COLUMN LAYOUT --- */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+        }
+
+        .column-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* --- CHAT GROUPS / SPACE CARDS --- */
+        .spaces-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .space-card {
+            background: rgba(17, 16, 28, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 24px;
+            display: flex;
+            gap: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .space-card:hover {
+            border-color: rgba(139, 92, 246, 0.3);
+            background: rgba(23, 21, 38, 0.8);
+            transform: translateX(4px);
+        }
+
+        .space-avatar {
+            width: 56px;
+            height: 56px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .space-info {
+            flex-grow: 1;
+        }
+
+        .space-meta-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .space-name {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+
+        .member-count {
+            font-size: 0.8rem;
+            color: #9CA3AF;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 4px 10px;
+            border-radius: 100px;
+        }
+
+        .space-desc {
+            font-size: 0.95rem;
+            color: #9CA3AF;
+            line-height: 1.5;
+            margin-bottom: 14px;
+        }
+
+        .space-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            font-size: 0.75rem;
+            color: #A78BFA;
+            background: rgba(139, 92, 246, 0.1);
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        /* --- SIDEBAR LEADERBOARD PANEL --- */
+        .leaderboard-panel {
+            background: rgba(17, 16, 28, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 24px;
+            padding: 24px;
+            height: fit-content;
+        }
+
+        .leaderboard-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 14px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .rank-num {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #9CA3AF;
+            width: 20px;
+        }
+
+        .leaderboard-item:nth-child(1) .rank-num { color: #F59E0B; } /* Gold */
+        .leaderboard-item:nth-child(2) .rank-num { color: #94A3B8; } /* Silver */
+        .leaderboard-item:nth-child(3) .rank-num { color: #B45309; } /* Bronze */
+
+        .avatar-placeholder {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #8B5CF6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+
+        .username {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #FFFFFF;
+        }
+
+        .swap-count {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #38BDF8;
+        }
+
+        /* --- RESPONSIVE MEDIA QUERIES --- */
+        @media (max-width: 1024px) {
+            nav { padding: 0 24px; }
+            .nav-links { gap: 16px; }
+            .main-layout { grid-template-columns: 1fr; gap: 40px; }
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 120px 16px 60px 16px; }
+            .section-title { font-size: 2rem; }
+            .featured-banner { flex-direction: column; text-align: center; gap: 20px; align-items: center; }
+            .hamburger { display: flex; }
+            
+            /* Responsive Mobile Menu Drawer */
+            .nav-links {
+                position: fixed;
+                top: 80px;
+                right: -100%;
+                width: 100%;
+                height: calc(100vh - 80px);
+                background: rgba(8, 7, 17, 0.96);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                flex-direction: column;
+                justify-content: flex-start;
+                padding: 40px 24px;
+                gap: 24px;
+                transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                border-top: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            .nav-links.active { right: 0; }
+            .nav-links li { width: 100%; text-align: center; }
+            .nav-links li a { font-size: 1.2rem; display: block; padding: 12px 0; }
+            .nav-cta { display: inline-block; width: 80%; margin: 20px auto 0 auto; }
+
+            .hamburger.active span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+            .hamburger.active span:nth-child(2) { opacity: 0; }
+            .hamburger.active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="nav-logo">SkillSwap</a>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#how">How it Works</a></li>
+            <li><a href="skills.html">Browse Skills</a></li>
+            <li><a href="community.html">Community</a></li>
+            <li><a href="sessions.html">Sessions</a></li>
+            <li><a href="leaderboard.html">Leaderboard</a></li>
+            <li><a href="messages.html">Messages</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="#pricing" class="nav-cta">Get Started</a></li>
+        </ul>
+        <button class="hamburger" id="hamburgerBtn" onclick="toggleMenu()" aria-label="Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </nav>
+
+    <main class="community-container">
+        
+        <div class="section-header">
+            <span class="section-tag">Community Hub</span>
+            <h2 class="section-title">Learn together. Grow together.</h2>
+        </div>
+
+        <div class="featured-banner">
+            <div class="banner-content">
+                <h3>Global Hackathon 2026 Starting Soon!</h3>
+                <p>Team up with developers, designers, and marketers across SkillSwap. Build projects, swap knowledge, and win exclusive prizes.</p>
+            </div>
+            <a href="#" class="join-btn">Register Team</a>
+        </div>
+
+        <div class="main-layout">
+            
+            <section>
+                <h2 class="column-title">🔥 Active Spaces</h2>
+                <div class="spaces-list">
+                    
+                    <a href="#" class="space-card">
+                        <div class="space-avatar">💻</div>
+                        <div class="space-info">
+                            <div class="space-meta-top">
+                                <h4 class="space-name">MERN Stack Developers</h4>
+                                <span class="member-count">1.4k active</span>
+                            </div>
+                            <p class="space-desc">Discuss database models, API structures, React hooks, and deployment strategies with active developers.</p>
+                            <div class="space-tags">
+                                <span class="tag">MongoDB</span>
+                                <span class="tag">React</span>
+                                <span class="tag">Node.js</span>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="#" class="space-card">
+                        <div class="space-avatar">✨</div>
+                        <div class="space-info">
+                            <div class="space-meta-top">
+                                <h4 class="space-name">UI/UX Design Systems</h4>
+                                <span class="member-count">920 active</span>
+                            </div>
+                            <p class="space-desc">Share feedback on wireframes, user journeys, prototyping setups, and interactive Figma systems.</p>
+                            <div class="space-tags">
+                                <span class="tag">Figma</span>
+                                <span class="tag">Prototyping</span>
+                                <span class="tag">UI Research</span>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="#" class="space-card">
+                        <div class="space-avatar">📈</div>
+                        <div class="space-info">
+                            <div class="space-meta-top">
+                                <h4 class="space-name">Growth & Marketing Circle</h4>
+                                <span class="member-count">850 active</span>
+                            </div>
+                            <p class="space-desc">Discussions focused on brand scalability, targeted paid marketing metrics, SEO frameworks, and product metrics.</p>
+                            <div class="space-tags">
+                                <span class="tag">SEO</span>
+                                <span class="tag">Analytics</span>
+                                <span class="tag">Growth Strategy</span>
+                            </div>
+                        </div>
+                    </a>
+
+                </div>
+            </section>
+
+            <aside>
+                <h2 class="column-title">🏆 Top Swappers</h2>
+                <div class="leaderboard-panel">
+                    <div class="leaderboard-list">
+                        
+                        <div class="leaderboard-item">
+                            <div class="user-profile">
+                                <span class="rank-num">#1</span>
+                                <div class="avatar-placeholder" style="background: #F59E0B;">JD</div>
+                                <span class="username">Jitendra D.</span>
+                            </div>
+                            <span class="swap-count">142 Swaps</span>
+                        </div>
+
+                        <div class="leaderboard-item">
+                            <div class="user-profile">
+                                <span class="rank-num">#2</span>
+                                <div class="avatar-placeholder" style="background: #3B82F6;">SK</div>
+                                <span class="username">Sarah K.</span>
+                            </div>
+                            <span class="swap-count">118 Swaps</span>
+                        </div>
+
+                        <div class="leaderboard-item">
+                            <div class="user-profile">
+                                <span class="rank-num">#3</span>
+                                <div class="avatar-placeholder" style="background: #10B981;">AM</div>
+                                <span class="username">Alex M.</span>
+                            </div>
+                            <span class="swap-count">95 Swaps</span>
+                        </div>
+
+                        <div class="leaderboard-item">
+                            <div class="user-profile">
+                                <span class="rank-num">#4</span>
+                                <div class="avatar-placeholder" style="background: #EC4899;">RN</div>
+                                <span class="username">Rohan N.</span>
+                            </div>
+                            <span class="swap-count">84 Swaps</span>
+                        </div>
+
+                    </div>
+                </div>
+            </aside>
+
+        </div>
+    </main>
+
+    <script>
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            
+            navLinks.classList.toggle('active');
+            hamburgerBtn.classList.toggle('active');
+        }
+
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                const navLinks = document.getElementById('navLinks');
+                const hamburgerBtn = document.getElementById('hamburgerBtn');
+                if(navLinks.classList.contains('active')) {
+                    navLinks.classList.remove('active');
+                    hamburgerBtn.classList.remove('active');
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
