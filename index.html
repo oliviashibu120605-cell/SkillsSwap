@@ -11,6 +11,23 @@
 html{
   scroll-behavior:smooth;
 }
+
+/* Custom CSS Marquee Animation */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 25s linear infinite;
+}
+
+/* Pause animation on hover for better UX */
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
 </style>
 </head>
 
@@ -75,7 +92,7 @@ html{
 
 </section>
 
-<section id="product" class="pb-24">
+<section id="product" class="pb-12">
 
   <div class="max-w-5xl mx-auto px-6">
 
@@ -114,6 +131,32 @@ html{
   </div>
 
 </section>
+
+<div class="w-full overflow-hidden bg-white py-6 border-y border-gray-100">
+  <div class="animate-marquee gap-4 text-sm font-medium">
+    <span class="bg-purple-50 text-purple-700 px-4 py-2 rounded-xl mx-2 border border-purple-100">💻 React Node.js</span>
+    <span class="bg-purple-50 text-purple-700 px-4 py-2 rounded-xl mx-2 border border-purple-100">🎨 UI/UX Design</span>
+    <span class="bg-purple-50 text-purple-700 px-4 py-2 rounded-xl mx-2 border border-purple-100">🇰🇷 Korean Language</span>
+    <span class="bg-purple-50 text-purple-700 px-4 py-2 rounded-xl mx-2 border border-purple-100">📸 Photography</span>
+    <span class="bg-purple-50 text-purple-700 px-4 py-2 rounded-xl mx-2 border border-purple-100">📈 Digital Marketing</span>
+    <span class="bg-purple-50 text-purple-700 px-4 py-2 rounded-xl mx-2 border border-purple-100">🎸 Acoustic Guitar</span>
+    <span class="bg-purple-50 text-purple-700 px-4 py-2 rounded-xl mx-2 border border-purple-100">🇪🇸 Spanish Speaking</span>
+    <span class="bg-purple-50 text-purple-700 px-4 py-2 rounded-xl mx-2 border border-purple-100">🐍 Python Basics</span>
+    <span class="bg-purple-50 text-purple-700 px-4 py-2 rounded-xl mx-2 border border-purple-100">✍️ Copywriting</span>
+    <span class="bg-purple-50 text-purple-700 px-4 py-2 rounded-xl mx-2 border border-purple-100">🎬 Video Editing</span>
+
+    <span class="bg-purple-50 text-purple-700 px-4 py-2 rounded-xl mx-2 border border-purple-100">💻 React Node.js</span>
+    <span class="bg-purple-50 text-purple-700 px-4 py-2 rounded-xl mx-2 border border-purple-100">🎨 UI/UX Design</span>
+    <span class="bg-purple-50 text-purple-700 px-4 py-2 rounded-xl mx-2 border border-purple-100">🇰🇷 Korean Language</span>
+    <span class="bg-purple-50 text-purple-700 px-4 py-2 rounded-xl mx-2 border border-purple-100">📸 Photography</span>
+    <span class="bg-purple-50 text-purple-700 px-4 py-2 rounded-xl mx-2 border border-purple-100">📈 Digital Marketing</span>
+    <span class="bg-purple-50 text-purple-700 px-4 py-2 rounded-xl mx-2 border border-purple-100">🎸 Acoustic Guitar</span>
+    <span class="bg-purple-50 text-purple-700 px-4 py-2 rounded-xl mx-2 border border-purple-100">🇪🇸 Spanish Speaking</span>
+    <span class="bg-purple-50 text-purple-700 px-4 py-2 rounded-xl mx-2 border border-purple-100">🐍 Python Basics</span>
+    <span class="bg-purple-50 text-purple-700 px-4 py-2 rounded-xl mx-2 border border-purple-100">✍️ Copywriting</span>
+    <span class="bg-purple-50 text-purple-700 px-4 py-2 rounded-xl mx-2 border border-purple-100">🎬 Video Editing</span>
+  </div>
+</div>
 
 <section id="features" class="py-20 bg-purple-50">
 
