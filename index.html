@@ -72,6 +72,10 @@ html{
       unlimited learning requests with SkillSwap Pro.
     </p>
 
+    <p id="quote" class="mt-4 text-sm text-gray-500 italic max-w-xl mx-auto">
+      Loading today's quote...
+    </p>
+
     <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4">
       <button class="bg-purple-600 text-white px-6 py-3 rounded-xl">
         Start Free
@@ -156,6 +160,11 @@ html{
     <span class="bg-purple-50 text-purple-700 px-4 py-2 rounded-xl mx-2 border border-purple-100">✍️ Copywriting</span>
     <span class="bg-purple-50 text-purple-700 px-4 py-2 rounded-xl mx-2 border border-purple-100">🎬 Video Editing</span>
   </div>
+</div>
+
+<div class="max-w-3xl mx-auto px-6 py-6 text-center text-sm text-gray-500">
+  <span class="font-semibold text-purple-600">🐱 Random Fact:</span>
+  <span id="random-fact">Loading a random fact...</span>
 </div>
 
 <section id="features" class="py-20 bg-purple-50">
@@ -264,6 +273,28 @@ html{
   </div>
 
 </section>
+
+<section id="video" class="py-24 bg-purple-50">
+
+  <div class="max-w-4xl mx-auto px-6 text-center">
+
+    <h2 class="text-4xl font-bold mb-12">
+      Watch Why You Need To Learn
+    </h2>
+
+    <video
+      class="mx-auto  shadow-xl"
+      width="200"
+      controls
+    >
+      <source src="./skills.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+
+  </div>
+
+</section>
+
 <section id="pricing" class="py-24">
 
   <div class="max-w-4xl mx-auto px-6">
@@ -349,6 +380,33 @@ html{
 <footer class="bg-gray-900 text-white text-center py-8">
   © 2026 SkillSwap. Learn • Teach • Earn
 </footer>
+
+<script>
+  // 1. Quote API
+  fetch('https://api.quotable.io/random')
+    .then(res => res.json())
+    .then(data => document.getElementById('quote').innerText = `"${data.content}" - ${data.author}`);
+
+  // 2. Advice API (hidden in console for debugging)
+  fetch('https://api.adviceslip.com/advice')
+    .then(res => res.json())
+    .then(data => console.log("Life Advice:", data.slip.advice));
+
+  // 3. IPify (Your connection)
+  fetch('https://api.ipify.org?format=json')
+    .then(res => res.json())
+    .then(data => console.log("Your connection IP:", data.ip));
+
+  // 4. Cat Fact API
+  fetch('https://catfact.ninja/fact')
+    .then(res => res.json())
+    .then(data => document.getElementById('random-fact').innerText = data.fact);
+
+  // 5. Random User API
+  fetch('https://randomuser.me/api/')
+    .then(res => res.json())
+    .then(data => console.log("Random Mentor of the day:", data.results[0].name.first));
+</script>
 
 </body>
 </html>
