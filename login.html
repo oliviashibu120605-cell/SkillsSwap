@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log In — SkillSwap</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+html { scroll-behavior: smooth; }
+
+body.dark-mode { background-color: #0f0a1a; color: #f1ecff; }
+body.dark-mode .card { background-color: #1a1330; border-color: #2a2040; }
+body.dark-mode input, body.dark-mode select { background-color: #150f26; border-color: #2a2040; color: #f1ecff; }
+body.dark-mode .tab-inactive { color: #a99fd1; }
+
+.field-error {
+  color: #dc2626;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  display: none;
+}
+.field-error.show { display: block; }
+
+input.invalid {
+  border-color: #dc2626 !important;
+}
+
+.strength-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  overflow: hidden;
+}
+.strength-fill {
+  height: 100%;
+  width: 0%;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: #16a34a; color: white; padding: 12px 20px; border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  transform: translateY(100px); opacity: 0; transition: all 0.4s ease;
+  z-index: 200; font-size: 0.9rem;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+.shake { animation: shake 0.4s; }
+@keyframes shake {
+  10%, 90% { transform: translateX(-2px); }
+  20%, 80% { transform: translateX(4px); }
+  30%, 50%, 70% { transform: translateX(-8px); }
+  40%, 60% { transform: translateX(8px); }
+}
+</style>
+</head>
+
+<body class="bg-purple-50 text-gray-900 min-h-screen">
+
+<header>
+  <nav class="w-full bg-white/90 backdrop-blur border-b">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+      <a href="index.html" class="text-2xl font-bold text-purple-600">SkillSwap</a>
+      <button id="themeToggle" type="button" aria-label="Toggle dark mode" class="border rounded-xl px-3 py-1 text-sm hover:bg-purple-50">🌙</button>
+    </div>
+  </nav>
+</header>
+
+<main class="flex items-center justify-center px-6 py-16">
+  <div class="card bg-white border shadow-xl rounded-3xl p-8 w-full max-w-md">
+
+    <!-- Tabs: click event handling to switch between Login / Sign Up -->
+    <div class="flex border-b mb-8">
+      <button id="loginTab" type="button" class="flex-1 pb-3 font-bold text-purple-600 border-b-2 border-purple-600">
+        Log In
+      </button>
+      <button id="signupTab" type="button" class="flex-1 pb-3 font-bold text-gray-400 tab-inactive">
+        Sign Up
+      </button>
+    </div>
+
+    <!-- ===================== LOGIN FORM ===================== -->
+    <form id="loginForm" novalidate class="space-y-5">
+
+      <div>
+        <label for="loginEmail" class="block text-sm font-semibold mb-1">Email</label>
+        <input id="loginEmail" name="loginEmail" type="email" autocomplete="email" placeholder="you@example.com"
+          class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400">
+        <p class="field-error" data-error-for="loginEmail">Please enter a valid email address.</p>
+      </div>
+
+      <div>
+        <label for="loginPassword" class="block text-sm font-semibold mb-1">Password</label>
+        <div class="relative">
+          <input id="loginPassword" name="loginPassword" type="password" autocomplete="current-password" placeholder="••••••••"
+            class="w-full border rounded-xl px-4 py-2 pr-12 focus:outline-none focus:ring-2 focus:ring-purple-400">
+          <button type="button" id="toggleLoginPw" class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 hover:text-purple-600" aria-label="Show password">👁️</button>
+        </div>
+        <p class="field-error" data-error-for="loginPassword">Password must be at least 6 characters.</p>
+      </div>
+
+      <div class="flex items-center justify-between text-sm">
+        <label class="flex items-center gap-2">
+          <input id="rememberMe" type="checkbox" class="rounded">
+          Remember me
+        </label>
+        <a href="#" class="text-purple-600 hover:underline">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-xl font-bold hover:bg-purple-700">
+        Log In
+      </button>
+
+      <p id="loginMsg" class="text-sm text-center text-gray-500"></p>
+    </form>
+
+    <!-- ===================== SIGNUP FORM ===================== -->
+    <form id="signupForm" novalidate class="space-y-5 hidden">
+
+      <div>
+        <label for="signupName" class="block text-sm font-semibold mb-1">Full Name</label>
+        <input id="signupName" name="signupName" type="text" autocomplete="name" placeholder="Olivia Shibu"
+          class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400">
+        <p class="field-error" data-error-for="signupName">Please enter your name (at least 3 characters).</p>
+      </div>
+
+      <div>
+        <label for="signupEmail" class="block text-sm font-semibold mb-1">Email</label>
+        <input id="signupEmail" name="signupEmail" type="email" autocomplete="email" placeholder="you@example.com"
+          class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400">
+        <p class="field-error" data-error-for="signupEmail">Please enter a valid email address.</p>
+      </div>
+
+      <div>
+        <label for="signupPassword" class="block text-sm font-semibold mb-1">Password</label>
+        <div class="relative">
+          <input id="signupPassword" name="signupPassword" type="password" autocomplete="new-password" placeholder="At least 6 characters"
+            class="w-full border rounded-xl px-4 py-2 pr-12 focus:outline-none focus:ring-2 focus:ring-purple-400">
+          <button type="button" id="toggleSignupPw" class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 hover:text-purple-600" aria-label="Show password">👁️</button>
+        </div>
+        <div class="strength-bar mt-2">
+          <div id="strengthFill" class="strength-fill"></div>
+        </div>
+        <p id="strengthLabel" class="text-xs text-gray-400 mt-1">Password strength</p>
+        <p class="field-error" data-error-for="signupPassword">Password must be at least 6 characters.</p>
+      </div>
+
+      <div>
+        <label for="signupConfirm" class="block text-sm font-semibold mb-1">Confirm Password</label>
+        <input id="signupConfirm" name="signupConfirm" type="password" autocomplete="new-password" placeholder="Re-enter password"
+          class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400">
+        <p class="field-error" data-error-for="signupConfirm">Passwords do not match.</p>
+      </div>
+
+      <label class="flex items-start gap-2 text-sm">
+        <input id="agreeTerms" type="checkbox" class="mt-1 rounded">
+        <span>I agree to the <a href="#" class="text-purple-600 hover:underline">Terms</a> and <a href="#" class="text-purple-600 hover:underline">Privacy Policy</a>.</span>
+      </label>
+      <p class="field-error" data-error-for="agreeTerms">You must agree to the terms to continue.</p>
+
+      <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-xl font-bold hover:bg-purple-700">
+        Create Account
+      </button>
+
+      <p id="signupMsg" class="text-sm text-center text-gray-500"></p>
+    </form>
+
+    <p class="text-center text-sm text-gray-400 mt-6">
+      <a href="index.html" class="hover:text-purple-600">← Back to home</a>
+    </p>
+
+  </div>
+</main>
+
+<div id="toast" class="toast"></div>
+
+<script>
+  /* ---------------------------------------------------------
+     Theme persistence (shared with index.html via localStorage)
+  --------------------------------------------------------- */
+  const themeToggle = document.getElementById('themeToggle');
+  function applyTheme(theme) {
+    document.body.classList.toggle('dark-mode', theme === 'dark');
+    themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+  }
+  applyTheme(localStorage.getItem('skillswap_theme') || 'light');
+  themeToggle.addEventListener('click', () => {
+    const next = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+    localStorage.setItem('skillswap_theme', next);
+    applyTheme(next);
+  });
+
+  function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+
+  /* ---------------------------------------------------------
+     Tab switching — click event handling
+  --------------------------------------------------------- */
+  const loginTab = document.getElementById('loginTab');
+  const signupTab = document.getElementById('signupTab');
+  const loginForm = document.getElementById('loginForm');
+  const signupForm = document.getElementById('signupForm');
+
+  function showLogin() {
+    loginForm.classList.remove('hidden');
+    signupForm.classList.add('hidden');
+    loginTab.classList.add('text-purple-600', 'border-b-2', 'border-purple-600');
+    loginTab.classList.remove('text-gray-400', 'tab-inactive');
+    signupTab.classList.remove('text-purple-600', 'border-b-2', 'border-purple-600');
+    signupTab.classList.add('text-gray-400', 'tab-inactive');
+  }
+  function showSignup() {
+    signupForm.classList.remove('hidden');
+    loginForm.classList.add('hidden');
+    signupTab.classList.add('text-purple-600', 'border-b-2', 'border-purple-600');
+    signupTab.classList.remove('text-gray-400', 'tab-inactive');
+    loginTab.classList.remove('text-purple-600', 'border-b-2', 'border-purple-600');
+    loginTab.classList.add('text-gray-400', 'tab-inactive');
+  }
+  loginTab.addEventListener('click', showLogin);
+  signupTab.addEventListener('click', showSignup);
+
+  /* ---------------------------------------------------------
+     Show/hide password toggles — click event handling
+  --------------------------------------------------------- */
+  function wireToggle(buttonId, inputId) {
+    const btn = document.getElementById(buttonId);
+    const input = document.getElementById(inputId);
+    btn.addEventListener('click', () => {
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      btn.textContent = isPassword ? '🙈' : '👁️';
+    });
+  }
+  wireToggle('toggleLoginPw', 'loginPassword');
+  wireToggle('toggleSignupPw', 'signupPassword');
+
+  /* ---------------------------------------------------------
+     Shared validation helpers
+  --------------------------------------------------------- */
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  function setError(fieldId, show) {
+    const errorEl = document.querySelector(`[data-error-for="${fieldId}"]`);
+    const inputEl = document.getElementById(fieldId);
+    if (errorEl) errorEl.classList.toggle('show', show);
+    if (inputEl) inputEl.classList.toggle('invalid', show);
+  }
+
+  function shakeForm(form) {
+    form.classList.add('shake');
+    setTimeout(() => form.classList.remove('shake'), 400);
+  }
+
+  /* ---------------------------------------------------------
+     LOGIN — client-side validation + simulated auth
+  --------------------------------------------------------- */
+  function validateLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    let valid = true;
+
+    setError('loginEmail', !emailRegex.test(email)); if (!emailRegex.test(email)) valid = false;
+    setError('loginPassword', password.length < 6); if (password.length < 6) valid = false;
+
+    return valid;
+  }
+  ['loginEmail', 'loginPassword'].forEach(id => {
+    document.getElementById(id).addEventListener('input', validateLogin);
+  });
+
+  loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!validateLogin()) { shakeForm(loginForm); return; }
+
+    const email = document.getElementById('loginEmail').value.trim();
+    const remember = document.getElementById('rememberMe').checked;
+    const displayName = email.split('@')[0];
+
+    // HTML5 Web Storage API: persistent vs session-only "remember me"
+    if (remember) {
+      localStorage.setItem('skillswap_user', displayName);
+    } else {
+      localStorage.setItem('skillswap_user', displayName);
+    }
+    sessionStorage.setItem('skillswap_justLoggedIn', '1');
+
+    document.getElementById('loginMsg').textContent = 'Login successful — redirecting...';
+    document.getElementById('loginMsg').classList.add('text-green-600');
+    setTimeout(() => { window.location.href = 'index.html'; }, 900);
+  });
+
+  // Pre-fill remembered email if previously saved
+  const rememberedEmail = localStorage.getItem('skillswap_rememberedEmail');
+  if (rememberedEmail) {
+    document.getElementById('loginEmail').value = rememberedEmail;
+    document.getElementById('rememberMe').checked = true;
+  }
+  document.getElementById('rememberMe').addEventListener('change', (e) => {
+    if (e.target.checked) {
+      localStorage.setItem('skillswap_rememberedEmail', document.getElementById('loginEmail').value.trim());
+    } else {
+      localStorage.removeItem('skillswap_rememberedEmail');
+    }
+  });
+
+  /* ---------------------------------------------------------
+     SIGN UP — validation, live password strength meter
+  --------------------------------------------------------- */
+  function passwordStrength(pw) {
+    let score = 0;
+    if (pw.length >= 6) score++;
+    if (pw.length >= 10) score++;
+    if (/[A-Z]/.test(pw)) score++;
+    if (/[0-9]/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+    return score; // 0–5
+  }
+
+  const strengthFill = document.getElementById('strengthFill');
+  const strengthLabel = document.getElementById('strengthLabel');
+  document.getElementById('signupPassword').addEventListener('input', (e) => {
+    const score = passwordStrength(e.target.value);
+    const pct = (score / 5) * 100;
+    strengthFill.style.width = pct + '%';
+    const colors = ['#dc2626', '#dc2626', '#f59e0b', '#f59e0b', '#16a34a', '#16a34a'];
+    strengthFill.style.backgroundColor = colors[score];
+    const labels = ['Too short', 'Weak', 'Fair', 'Fair', 'Strong', 'Very strong'];
+    strengthLabel.textContent = e.target.value.length === 0 ? 'Password strength' : labels[score];
+    validateSignup(false);
+  });
+
+  function validateSignup(checkAll = true) {
+    const name = document.getElementById('signupName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value;
+    const confirm = document.getElementById('signupConfirm').value;
+    const agreed = document.getElementById('agreeTerms').checked;
+    let valid = true;
+
+    if (checkAll || name.length > 0) { setError('signupName', name.length < 3); if (name.length < 3) valid = false; }
+    if (checkAll || email.length > 0) { setError('signupEmail', !emailRegex.test(email)); if (!emailRegex.test(email)) valid = false; }
+    setError('signupPassword', password.length > 0 && password.length < 6);
+    if (password.length < 6) valid = false;
+    if (checkAll || confirm.length > 0) { setError('signupConfirm', confirm.length > 0 && confirm !== password); if (confirm !== password) valid = false; }
+    if (checkAll) { setError('agreeTerms', !agreed); if (!agreed) valid = false; }
+
+    return valid;
+  }
+  ['signupName', 'signupEmail', 'signupConfirm'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => validateSignup(false));
+  });
+  document.getElementById('agreeTerms').addEventListener('change', () => validateSignup(false));
+
+  signupForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!validateSignup(true)) { shakeForm(signupForm); return; }
+
+    const name = document.getElementById('signupName').value.trim();
+    localStorage.setItem('skillswap_user', name);
+    sessionStorage.setItem('skillswap_justLoggedIn', '1');
+
+    document.getElementById('signupMsg').textContent = 'Account created — redirecting...';
+    document.getElementById('signupMsg').classList.add('text-green-600');
+    setTimeout(() => { window.location.href = 'index.html'; }, 900);
+  });
+</script>
+
+</body>
+</html>

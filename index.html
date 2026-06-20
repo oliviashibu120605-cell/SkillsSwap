@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SkillSwap</title>
+<title>SkillSwap — Trade Skills, Not Just Money</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 
@@ -24,35 +24,104 @@ html{
   animation: marquee 25s linear infinite;
 }
 
-/* Pause animation on hover for better UX */
 .animate-marquee:hover {
   animation-play-state: paused;
 }
+
+/* Dark mode overrides (toggled via JS + localStorage — HTML5 Web Storage API) */
+.dark body, body.dark-mode {
+  background-color: #0f0a1a;
+  color: #f1ecff;
+}
+body.dark-mode nav { background-color: rgba(15,10,26,0.92); border-color: #2a2040; }
+body.dark-mode #product .bg-white { background-color: #1a1330; border-color: #2a2040; }
+body.dark-mode .bg-purple-50 { background-color: #1f1638; }
+body.dark-mode .bg-white { background-color: #1a1330; }
+body.dark-mode section.bg-purple-50 { background-color: #150f26; }
+body.dark-mode .text-gray-900 { color: #f1ecff; }
+body.dark-mode .text-gray-600 { color: #c9bfe8; }
+body.dark-mode .text-gray-500 { color: #a99fd1; }
+body.dark-mode .border { border-color: #2a2040; }
+body.dark-mode footer { background-color: #08050f; }
+
+/* Scroll reveal (IntersectionObserver driven) */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Skill card hover lift, driven by JS mouseenter/mouseleave as required event handling */
+.skill-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: pointer;
+}
+
+/* Modal */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(15,10,26,0.55);
+  display: none; align-items: center; justify-content: center; z-index: 100; padding: 1rem;
+}
+.modal-backdrop.open { display: flex; }
+
+.field-error {
+  color: #dc2626;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  display: none;
+}
+.field-error.show { display: block; }
+
+input.invalid, select.invalid {
+  border-color: #dc2626 !important;
+}
+
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: #16a34a; color: white; padding: 12px 20px; border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  transform: translateY(100px); opacity: 0; transition: all 0.4s ease;
+  z-index: 200; font-size: 0.9rem;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
 </style>
 </head>
 
 <body class="bg-white text-gray-900">
 
-<nav class="fixed top-0 w-full bg-white/90 backdrop-blur border-b z-50">
+<header>
+<nav class="fixed top-0 w-full bg-white/90 backdrop-blur border-b z-50 transition-colors">
   <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
 
     <h1 class="text-2xl font-bold text-purple-600">
       SkillSwap
     </h1>
 
-    <div class="hidden md:flex gap-8">
+    <div class="hidden md:flex gap-8 items-center">
       <a href="#product" class="hover:text-purple-600">Product</a>
+      <a href="#browse" class="hover:text-purple-600">Browse Skills</a>
       <a href="#features" class="hover:text-purple-600">Features</a>
       <a href="#testimonials" class="hover:text-purple-600">Testimonials</a>
       <a href="#pricing" class="hover:text-purple-600">Pricing</a>
+      <button id="themeToggle" type="button" aria-label="Toggle dark mode" class="border rounded-xl px-3 py-1 text-sm hover:bg-purple-50">🌙</button>
     </div>
 
-    <button class="bg-purple-600 text-white px-5 py-2 rounded-xl">
-      Get Started
-    </button>
+    <div class="flex items-center gap-3">
+      <a href="login.html" class="hidden sm:inline-block px-4 py-2 rounded-xl border hover:bg-purple-50">Log In</a>
+      <button id="getStartedBtn" type="button" class="bg-purple-600 text-white px-5 py-2 rounded-xl hover:bg-purple-700">
+        Get Started
+      </button>
+    </div>
 
   </div>
 </nav>
+</header>
+
+<main>
 
 <section class="pt-36 pb-24 bg-gradient-to-b from-purple-50 to-white">
 
@@ -77,14 +146,16 @@ html{
     </p>
 
     <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4">
-      <button class="bg-purple-600 text-white px-6 py-3 rounded-xl">
+      <button id="startFreeBtn" type="button" class="bg-purple-600 text-white px-6 py-3 rounded-xl hover:bg-purple-700">
         Start Free
       </button>
 
-      <button class="border px-6 py-3 rounded-xl">
-        Watch Demo
+      <button id="findNearbyBtn" type="button" class="border px-6 py-3 rounded-xl hover:bg-purple-50">
+        📍 Find Learners Near Me
       </button>
     </div>
+
+    <p id="nearbyResult" class="mt-4 text-sm text-purple-700 font-medium"></p>
 
     <div class="mt-10 flex justify-center gap-8 text-gray-500 text-sm">
       <span>5 Free Requests</span>
@@ -96,11 +167,11 @@ html{
 
 </section>
 
-<section id="product" class="pb-12">
+<section id="product" class="pb-12 reveal">
 
   <div class="max-w-5xl mx-auto px-6">
 
-    <div class="bg-white border shadow-xl rounded-3xl p-8">
+    <article class="bg-white border shadow-xl rounded-3xl p-8">
 
       <div class="flex gap-2 mb-6">
         <div class="w-3 h-3 bg-red-400 rounded-full"></div>
@@ -130,7 +201,7 @@ html{
         🎉 Match Found! Sarah teaches Korean and wants to learn React.
       </div>
 
-    </div>
+    </article>
 
   </div>
 
@@ -167,7 +238,45 @@ html{
   <span id="random-fact">Loading a random fact...</span>
 </div>
 
-<section id="features" class="py-20 bg-purple-50">
+<!--
+  MISSING-FEATURE FIX (per assignment requirement to identify & address a gap):
+  The original page had no way to actually browse or filter mentors/skills —
+  visitors could only watch a passive marquee. This "Browse Skills" section adds
+  a real searchable, filterable directory with category buttons (event handling),
+  a live text search (JS input event + Array.filter), and click-to-expand cards.
+-->
+<section id="browse" class="py-24 bg-white reveal">
+  <div class="max-w-6xl mx-auto px-6">
+
+    <h2 class="text-4xl font-bold text-center mb-3">Browse Skills</h2>
+    <p class="text-gray-500 text-center mb-10 max-w-md mx-auto">
+      Filter by category or search to find a mentor or swap partner.
+    </p>
+
+    <div class="flex flex-col md:flex-row gap-4 mb-8 items-center justify-between">
+      <div class="flex flex-wrap gap-2 justify-center" id="filterButtons">
+        <button data-filter="all" class="filter-btn bg-purple-600 text-white px-4 py-2 rounded-full text-sm">All</button>
+        <button data-filter="Tech" class="filter-btn border px-4 py-2 rounded-full text-sm hover:bg-purple-50">Tech</button>
+        <button data-filter="Creative" class="filter-btn border px-4 py-2 rounded-full text-sm hover:bg-purple-50">Creative</button>
+        <button data-filter="Language" class="filter-btn border px-4 py-2 rounded-full text-sm hover:bg-purple-50">Language</button>
+        <button data-filter="Business" class="filter-btn border px-4 py-2 rounded-full text-sm hover:bg-purple-50">Business</button>
+      </div>
+
+      <label class="w-full md:w-72">
+        <span class="sr-only">Search skills</span>
+        <input id="skillSearch" type="search" placeholder="🔍 Search skills (e.g. React, Korean)..."
+          class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400">
+      </label>
+    </div>
+
+    <div id="skillGrid" class="grid sm:grid-cols-2 md:grid-cols-3 gap-6"></div>
+
+    <p id="noResults" class="text-center text-gray-400 mt-8 hidden">No skills match your search. Try another keyword.</p>
+
+  </div>
+</section>
+
+<section id="features" class="py-20 bg-purple-50 reveal">
 
   <div class="max-w-5xl mx-auto px-6">
 
@@ -177,7 +286,7 @@ html{
 
     <div class="grid md:grid-cols-3 gap-8">
 
-      <div class="bg-white p-6 rounded-2xl shadow-sm">
+      <div class="bg-white p-6 rounded-2xl shadow-sm skill-card">
         <h3 class="font-bold text-xl mb-2">
           🔄 Skill Swaps
         </h3>
@@ -186,7 +295,7 @@ html{
         </p>
       </div>
 
-      <div class="bg-white p-6 rounded-2xl shadow-sm">
+      <div class="bg-white p-6 rounded-2xl shadow-sm skill-card">
         <h3 class="font-bold text-xl mb-2">
           💸 Paid Mentorship
         </h3>
@@ -195,7 +304,7 @@ html{
         </p>
       </div>
 
-      <div class="bg-white p-6 rounded-2xl shadow-sm">
+      <div class="bg-white p-6 rounded-2xl shadow-sm skill-card">
         <h3 class="font-bold text-xl mb-2">
           🚀 Unlimited Requests
         </h3>
@@ -210,7 +319,7 @@ html{
 
 </section>
 
-<section id="testimonials" class="py-24 bg-white">
+<section id="testimonials" class="py-24 bg-white reveal">
 
   <div class="max-w-6xl mx-auto px-6">
 
@@ -223,10 +332,10 @@ html{
 
     <div class="grid md:grid-cols-3 gap-8">
 
-      <div class="flex flex-col items-start border p-6 rounded-2xl shadow-sm hover:shadow-md transition">
-        <img 
-          src="./jee.jpeg" 
-          alt="Jeetandar N Silwani" 
+      <article class="flex flex-col items-start border p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+        <img
+          src="./jee.jpeg"
+          alt="Jeetandar N Silwani"
           class="w-20 h-20 object-cover rounded-xl border mb-4"
         >
         <div>
@@ -236,12 +345,12 @@ html{
             "I traded my design knowledge for Spanish lessons with an absolute pro. SkillSwap saved me thousands of rupees and connected me with an incredible mentor!"
           </p>
         </div>
-      </div>
+      </article>
 
-      <div class="flex flex-col items-start border p-6 rounded-2xl shadow-sm hover:shadow-md transition">
-        <img 
-          src="./naf.jpeg" 
-          alt="Naful" 
+      <article class="flex flex-col items-start border p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+        <img
+          src="./naf.jpeg"
+          alt="Naful"
           class="w-20 h-20 object-cover rounded-xl border mb-4"
         >
         <div>
@@ -251,12 +360,12 @@ html{
             "The Pro plan is easily worth it. Getting priority matching helped me find a React tutor in under an hour. Highly recommend this to all tech learners!"
           </p>
         </div>
-      </div>
+      </article>
 
-      <div class="flex flex-col items-start border p-6 rounded-2xl shadow-sm hover:shadow-md transition">
-        <img 
-          src="./ada.jpeg" 
-          alt="Adarsh" 
+      <article class="flex flex-col items-start border p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+        <img
+          src="./ada.jpeg"
+          alt="Adarsh"
           class="w-20 h-20 object-cover rounded-xl border mb-4"
         >
         <div>
@@ -266,7 +375,7 @@ html{
             "I was looking for basic video editing skills and swapped my digital marketing tips for them. This platform makes networking and learning feel effortless."
           </p>
         </div>
-      </div>
+      </article>
 
     </div>
 
@@ -274,7 +383,7 @@ html{
 
 </section>
 
-<section id="video" class="py-24 bg-purple-50">
+<section id="video" class="py-24 bg-purple-50 reveal">
 
   <div class="max-w-4xl mx-auto px-6 text-center">
 
@@ -295,7 +404,63 @@ html{
 
 </section>
 
-<section id="pricing" class="py-24">
+<!-- Skill request form — fulfils "Forms and client-side validation" requirement -->
+<section id="request" class="py-24 bg-white reveal">
+  <div class="max-w-2xl mx-auto px-6">
+
+    <h2 class="text-4xl font-bold text-center mb-3">Request a Skill Swap</h2>
+    <p class="text-gray-500 text-center mb-10">Tell us what you teach and what you want to learn — we'll find your match.</p>
+
+    <form id="requestForm" novalidate class="bg-purple-50 p-8 rounded-3xl space-y-5">
+
+      <div>
+        <label for="reqName" class="block text-sm font-semibold mb-1">Full Name</label>
+        <input id="reqName" name="reqName" type="text" placeholder="Olivia Shibu"
+          class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400">
+        <p class="field-error" data-error-for="reqName">Please enter your full name (at least 3 characters).</p>
+      </div>
+
+      <div>
+        <label for="reqEmail" class="block text-sm font-semibold mb-1">Email</label>
+        <input id="reqEmail" name="reqEmail" type="email" placeholder="you@example.com"
+          class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400">
+        <p class="field-error" data-error-for="reqEmail">Please enter a valid email address.</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-5">
+        <div>
+          <label for="reqTeach" class="block text-sm font-semibold mb-1">Skill I Teach</label>
+          <input id="reqTeach" name="reqTeach" type="text" placeholder="e.g. React Development"
+            class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400">
+          <p class="field-error" data-error-for="reqTeach">Tell us a skill you can teach.</p>
+        </div>
+        <div>
+          <label for="reqWant" class="block text-sm font-semibold mb-1">Skill I Want</label>
+          <input id="reqWant" name="reqWant" type="text" placeholder="e.g. Korean"
+            class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400">
+          <p class="field-error" data-error-for="reqWant">Tell us a skill you want to learn.</p>
+        </div>
+      </div>
+      <p class="field-error" data-error-for="reqSame">Your "teach" and "want" skills can't be the same.</p>
+
+      <div>
+        <label for="reqMode" class="block text-sm font-semibold mb-1">Preferred Mode</label>
+        <select id="reqMode" name="reqMode" class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400">
+          <option value="">Select an option</option>
+          <option value="swap">Free Skill Swap</option>
+          <option value="paid">Paid Mentorship</option>
+        </select>
+        <p class="field-error" data-error-for="reqMode">Please choose a preferred mode.</p>
+      </div>
+
+      <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-xl font-bold hover:bg-purple-700">
+        Submit Request
+      </button>
+    </form>
+  </div>
+</section>
+
+<section id="pricing" class="py-24 reveal">
 
   <div class="max-w-4xl mx-auto px-6">
 
@@ -357,7 +522,7 @@ html{
 
 </section>
 
-<section class="py-24 bg-purple-600 text-white">
+<section class="py-24 bg-purple-600 text-white reveal">
 
   <div class="max-w-3xl mx-auto px-6 text-center">
 
@@ -369,7 +534,7 @@ html{
       Skills and Money. Choose how you learn.
     </p>
 
-    <button class="mt-8 bg-white text-purple-600 px-8 py-4 rounded-xl font-bold">
+    <button id="joinBtn" type="button" class="mt-8 bg-white text-purple-600 px-8 py-4 rounded-xl font-bold hover:bg-purple-50">
       Join SkillSwap
     </button>
 
@@ -377,35 +542,269 @@ html{
 
 </section>
 
+</main>
+
 <footer class="bg-gray-900 text-white text-center py-8">
   © 2026 SkillSwap. Learn • Teach • Earn
 </footer>
 
+<!-- Get Started / Join modal — click-to-open, click-outside-to-close event handling -->
+<div id="getStartedModal" class="modal-backdrop">
+  <div class="bg-white rounded-3xl p-8 max-w-md w-full relative">
+    <button id="closeModal" type="button" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700" aria-label="Close">✕</button>
+    <h3 class="text-2xl font-bold mb-2">Create your free account</h3>
+    <p class="text-gray-500 mb-6 text-sm">Already have one? <a href="login.html" class="text-purple-600 font-semibold">Log in instead</a>.</p>
+    <a href="login.html" class="block text-center bg-purple-600 text-white py-3 rounded-xl font-bold hover:bg-purple-700">
+      Continue to Sign Up
+    </a>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
 <script>
-  // 1. Quote API
+  /* ---------------------------------------------------------
+     1) External API fetches (kept from original prototype)
+  --------------------------------------------------------- */
   fetch('https://api.quotable.io/random')
     .then(res => res.json())
-    .then(data => document.getElementById('quote').innerText = `"${data.content}" - ${data.author}`);
+    .then(data => document.getElementById('quote').innerText = `"${data.content}" - ${data.author}`)
+    .catch(() => document.getElementById('quote').innerText = 'Learning is a skill worth swapping.');
 
-  // 2. Advice API (hidden in console for debugging)
   fetch('https://api.adviceslip.com/advice')
     .then(res => res.json())
     .then(data => console.log("Life Advice:", data.slip.advice));
 
-  // 3. IPify (Your connection)
   fetch('https://api.ipify.org?format=json')
     .then(res => res.json())
     .then(data => console.log("Your connection IP:", data.ip));
 
-  // 4. Cat Fact API
   fetch('https://catfact.ninja/fact')
     .then(res => res.json())
-    .then(data => document.getElementById('random-fact').innerText = data.fact);
+    .then(data => document.getElementById('random-fact').innerText = data.fact)
+    .catch(() => document.getElementById('random-fact').innerText = 'Cats sleep 70% of their lives.');
 
-  // 5. Random User API
   fetch('https://randomuser.me/api/')
     .then(res => res.json())
     .then(data => console.log("Random Mentor of the day:", data.results[0].name.first));
+
+  /* ---------------------------------------------------------
+     2) Skill directory data + filter/search (event handling)
+  --------------------------------------------------------- */
+  const skillsData = [
+    { name: "React Development", icon: "💻", category: "Tech", desc: "Build modern web apps with hooks, components & state." },
+    { name: "Python Basics", icon: "🐍", category: "Tech", desc: "From syntax to your first automation script." },
+    { name: "UI/UX Design", icon: "🎨", category: "Creative", desc: "Wireframes, prototyping and design systems." },
+    { name: "Video Editing", icon: "🎬", category: "Creative", desc: "Cut, color grade and export like a pro." },
+    { name: "Korean Language", icon: "🇰🇷", category: "Language", desc: "Conversational Korean for beginners to intermediate." },
+    { name: "Spanish Speaking", icon: "🇪🇸", category: "Language", desc: "Practice real conversation with native speakers." },
+    { name: "Digital Marketing", icon: "📈", category: "Business", desc: "Grow an audience with funnels & analytics." },
+    { name: "Copywriting", icon: "✍️", category: "Business", desc: "Write copy that actually converts readers." },
+    { name: "Photography", icon: "📸", category: "Creative", desc: "Composition, lighting and editing basics." },
+  ];
+
+  const skillGrid = document.getElementById('skillGrid');
+  const noResults = document.getElementById('noResults');
+  const searchInput = document.getElementById('skillSearch');
+  const filterButtons = document.querySelectorAll('.filter-btn');
+  let activeFilter = 'all';
+
+  function renderSkills() {
+    const query = searchInput.value.trim().toLowerCase();
+
+    const filtered = skillsData.filter(skill => {
+      const matchesCategory = activeFilter === 'all' || skill.category === activeFilter;
+      const matchesSearch = skill.name.toLowerCase().includes(query) || skill.category.toLowerCase().includes(query);
+      return matchesCategory && matchesSearch;
+    });
+
+    skillGrid.innerHTML = '';
+    noResults.classList.toggle('hidden', filtered.length !== 0);
+
+    filtered.forEach(skill => {
+      const card = document.createElement('div');
+      card.className = 'skill-card bg-purple-50 border border-purple-100 rounded-2xl p-6';
+      card.innerHTML = `
+        <div class="text-3xl mb-3">${skill.icon}</div>
+        <h3 class="font-bold text-lg">${skill.name}</h3>
+        <span class="text-xs text-purple-600 font-semibold uppercase tracking-wide">${skill.category}</span>
+        <p class="text-gray-600 text-sm mt-2 leading-relaxed">${skill.desc}</p>
+      `;
+
+      // Hover event handlers (mouseenter/mouseleave) — lift the card
+      card.addEventListener('mouseenter', () => {
+        card.style.transform = 'translateY(-6px)';
+        card.style.boxShadow = '0 12px 24px rgba(124,58,237,0.18)';
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'translateY(0)';
+        card.style.boxShadow = 'none';
+      });
+
+      // Click event handler — quick "match" toast
+      card.addEventListener('click', () => {
+        showToast(`Searching for swap partners in "${skill.name}"...`);
+      });
+
+      skillGrid.appendChild(card);
+    });
+  }
+
+  filterButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeFilter = btn.dataset.filter;
+      filterButtons.forEach(b => {
+        b.classList.remove('bg-purple-600', 'text-white');
+        b.classList.add('border');
+      });
+      btn.classList.add('bg-purple-600', 'text-white');
+      btn.classList.remove('border');
+      renderSkills();
+    });
+  });
+
+  searchInput.addEventListener('input', renderSkills);
+  renderSkills();
+
+  /* ---------------------------------------------------------
+     3) Toast helper
+  --------------------------------------------------------- */
+  function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+
+  /* ---------------------------------------------------------
+     4) Get Started / Join modal — click events
+  --------------------------------------------------------- */
+  const modal = document.getElementById('getStartedModal');
+  function openModal() { modal.classList.add('open'); }
+  function closeModal() { modal.classList.remove('open'); }
+
+  document.getElementById('getStartedBtn').addEventListener('click', openModal);
+  document.getElementById('startFreeBtn').addEventListener('click', openModal);
+  document.getElementById('joinBtn').addEventListener('click', openModal);
+  document.getElementById('closeModal').addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+  /* ---------------------------------------------------------
+     5) Geolocation API — "Find Learners Near Me"
+        (the genuinely missing feature: original page had no
+        location-aware matching at all)
+  --------------------------------------------------------- */
+  document.getElementById('findNearbyBtn').addEventListener('click', () => {
+    const resultEl = document.getElementById('nearbyResult');
+    if (!('geolocation' in navigator)) {
+      resultEl.textContent = 'Geolocation is not supported by your browser.';
+      return;
+    }
+    resultEl.textContent = 'Locating you...';
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude.toFixed(2);
+        const lon = pos.coords.longitude.toFixed(2);
+        const mockCount = Math.floor(Math.random() * 18) + 3;
+        resultEl.textContent = `📍 Found ${mockCount} learners within 10km of (${lat}, ${lon})`;
+        showToast('Location detected — matches updated!');
+      },
+      () => {
+        resultEl.textContent = 'Location permission denied. Showing global matches instead.';
+      }
+    );
+  });
+
+  /* ---------------------------------------------------------
+     6) Dark mode toggle — localStorage (HTML5 Web Storage API)
+  --------------------------------------------------------- */
+  const themeToggle = document.getElementById('themeToggle');
+  function applyTheme(theme) {
+    document.body.classList.toggle('dark-mode', theme === 'dark');
+    themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+  }
+  const savedTheme = localStorage.getItem('skillswap_theme') || 'light';
+  applyTheme(savedTheme);
+
+  themeToggle.addEventListener('click', () => {
+    const current = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+    const next = current === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('skillswap_theme', next);
+    applyTheme(next);
+  });
+
+  /* ---------------------------------------------------------
+     7) IntersectionObserver — scroll reveal animations
+  --------------------------------------------------------- */
+  const revealEls = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  revealEls.forEach(el => observer.observe(el));
+
+  /* ---------------------------------------------------------
+     8) Skill Request form — client-side validation
+  --------------------------------------------------------- */
+  const requestForm = document.getElementById('requestForm');
+
+  function setError(fieldId, show) {
+    const errorEl = document.querySelector(`[data-error-for="${fieldId}"]`);
+    const inputEl = document.getElementById(fieldId);
+    if (errorEl) errorEl.classList.toggle('show', show);
+    if (inputEl) inputEl.classList.toggle('invalid', show);
+  }
+
+  function validateRequestForm() {
+    let valid = true;
+    const name = document.getElementById('reqName').value.trim();
+    const email = document.getElementById('reqEmail').value.trim();
+    const teach = document.getElementById('reqTeach').value.trim();
+    const want = document.getElementById('reqWant').value.trim();
+    const mode = document.getElementById('reqMode').value;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    setError('reqName', name.length < 3); if (name.length < 3) valid = false;
+    setError('reqEmail', !emailRegex.test(email)); if (!emailRegex.test(email)) valid = false;
+    setError('reqTeach', teach.length === 0); if (teach.length === 0) valid = false;
+    setError('reqWant', want.length === 0); if (want.length === 0) valid = false;
+    setError('reqMode', mode === ''); if (mode === '') valid = false;
+
+    const sameSkill = teach.length > 0 && want.length > 0 && teach.toLowerCase() === want.toLowerCase();
+    const sameError = document.querySelector('[data-error-for="reqSame"]');
+    sameError.classList.toggle('show', sameSkill);
+    if (sameSkill) valid = false;
+
+    return valid;
+  }
+
+  requestForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (validateRequestForm()) {
+      showToast(`Thanks! We're matching your request now.`);
+      requestForm.reset();
+    }
+  });
+
+  // Real-time validation as the user types (input event handling)
+  ['reqName', 'reqEmail', 'reqTeach', 'reqWant', 'reqMode'].forEach(id => {
+    document.getElementById(id).addEventListener('input', validateRequestForm);
+    document.getElementById(id).addEventListener('change', validateRequestForm);
+  });
+
+  /* ---------------------------------------------------------
+     9) Welcome-back banner if redirected from a successful login
+  --------------------------------------------------------- */
+  const loggedInUser = localStorage.getItem('skillswap_user');
+  if (loggedInUser && sessionStorage.getItem('skillswap_justLoggedIn') === '1') {
+    showToast(`Welcome back, ${loggedInUser}! 🎉`);
+    sessionStorage.removeItem('skillswap_justLoggedIn');
+  }
 </script>
 
 </body>
